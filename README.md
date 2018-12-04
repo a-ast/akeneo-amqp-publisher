@@ -1,2 +1,3 @@
-# akeneo-amqp-publisher
-Message publisher for PIM entities
+# Akeneo AMQP Publisher
+
+Message publisher for PIM entities.

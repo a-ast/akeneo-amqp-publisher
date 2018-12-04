@@ -1,0 +1,24 @@
+{
+    "name": "aa/akeneo-amqp-publisher",
+    "description": "Message publisher for PIM entities",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Andrey Astakhov",
+            "email": "andrey.astakhov@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Aa\\AkeneoAmqpPublisher\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "spec\\Aa\\AkeneoAmqpPublisher\\": "spec/"
+        }
+    }
+}
