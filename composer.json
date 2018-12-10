@@ -10,7 +10,7 @@
     ],
     "require": {
         "php": ">=7.1",
-        "aa/akeneo-entities": "dev-master",
+        "aa/akeneo-import-commands": "dev-master",
         "symfony/amqp-pack": "^1.0"
     },
     "autoload": {
