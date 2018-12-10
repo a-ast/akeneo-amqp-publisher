@@ -1,6 +1,6 @@
 {
-    "name": "aa/akeneo-amqp-publisher",
-    "description": "Message publisher for PIM entities",
+    "name": "aa/akeneo-import",
+    "description": "Library for product import to Akeneo PIM",
     "type": "library",
     "authors": [
         {
