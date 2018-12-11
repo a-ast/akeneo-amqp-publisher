@@ -20,6 +20,10 @@ class CommandListHandler implements MessageHandlerInterface
 
     public function __invoke(CommandListInterface $commands)
     {
+        // @todo: add logic for requeing / rejecting messages
+
+        sprintf('Got %d commands', count($commands));
+
         $this->handler->handle($commands);
     }
 }
