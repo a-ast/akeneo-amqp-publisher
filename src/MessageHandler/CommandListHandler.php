@@ -9,7 +9,7 @@ use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 class CommandListHandler implements MessageHandlerInterface
 {
     /**
-     * @var \Aa\Akeneo\ImportCommands\CommandHandlerInterface
+     * @var CommandHandlerInterface
      */
     private $handler;
 

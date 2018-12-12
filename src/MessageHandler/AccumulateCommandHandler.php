@@ -22,7 +22,7 @@ class AccumulateCommandHandler implements MessageHandlerInterface
     /**
      * @var array
      */
-    private $commandDispenser = [];
+    private $commandAccumulator = [];
 
     /**
      * @var int
@@ -44,21 +44,21 @@ class AccumulateCommandHandler implements MessageHandlerInterface
         }
 
         $commandClass = get_class($command);
-        $this->commandDispenser[$commandClass][] = $command;
+        $this->commandAccumulator[$commandClass][] = $command;
 
-        if ($this->maxCommandCount <= count($this->commandDispenser[$commandClass])) {
+        if ($this->maxCommandCount <= count($this->commandAccumulator[$commandClass])) {
 
-            $commandList = new CommandList($this->commandDispenser[$commandClass]);
+            $commandList = new CommandList($this->commandAccumulator[$commandClass]);
 
             $this->bus->dispatch($commandList);
 
-            $this->commandDispenser[$commandClass] = [];
+            $this->commandAccumulator[$commandClass] = [];
         }
     }
 
     protected function dispatchAll(): void
     {
-        foreach ($this->commandDispenser as $commands) {
+        foreach ($this->commandAccumulator as $commands) {
 
             if (!is_array($commands) || empty($commands)) {
                 continue;
