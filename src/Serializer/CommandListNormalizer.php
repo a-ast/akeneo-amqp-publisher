@@ -1,7 +1,8 @@
 <?php
 
-namespace Aa\AkeneoImport\Import\Serializer;
+namespace Aa\Akeneo\Import\Serializer;
 
+use Aa\AkeneoImport\ImportCommands\CommandList;
 use Aa\AkeneoImport\ImportCommands\Product\UpdateProduct;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -32,11 +33,11 @@ class CommandListNormalizer implements /* NormalizerInterface, */ DenormalizerIn
             $commands[] = $this->denormalizer->denormalize($item, UpdateProduct::class, $format, $context);
         }
 
-        return $commands;
+        return new CommandList($commands);
     }
 
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return 'json' === $format;
+        return 'json' === $format && CommandList::class === $type;
     }
 }
