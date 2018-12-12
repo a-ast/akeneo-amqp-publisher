@@ -1,6 +1,6 @@
 <?php
 
-namespace Aa\Akeneo\Import\Serializer;
+namespace Aa\AkeneoImport\Serializer;
 
 use Aa\AkeneoImport\ImportCommands\CommandList;
 use Aa\AkeneoImport\ImportCommands\Product\UpdateProduct;
@@ -9,21 +9,9 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class CommandListNormalizer implements /* NormalizerInterface, */ DenormalizerInterface
+class CommandListNormalizer implements DenormalizerInterface
 {
-
     use DenormalizerAwareTrait;
-
-
-//    public function normalize($object, $format = null, array $context = array())
-//    {
-//
-//    }
-//
-//    public function supportsNormalization($data, $format = null)
-//    {
-//
-//    }
 
     public function denormalize($data, $class, $format = null, array $context = array())
     {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Aa\Akeneo\Import\Handler;
+namespace Aa\AkeneoImport\MessageHandler;
 
 use Aa\AkeneoImport\ImportCommands\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommands\CommandListInterface;
