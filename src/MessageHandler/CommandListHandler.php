@@ -2,18 +2,18 @@
 
 namespace Aa\AkeneoImport\MessageHandler;
 
-use Aa\AkeneoImport\ImportCommands\CommandHandlerInterface;
+use Aa\AkeneoImport\ImportCommands\CommandListHandlerInterface;
 use Aa\AkeneoImport\ImportCommands\CommandListInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class CommandListHandler implements MessageHandlerInterface
 {
     /**
-     * @var CommandHandlerInterface
+     * @var CommandListHandlerInterface
      */
     private $handler;
 
-    public function __construct(CommandHandlerInterface $handler)
+    public function __construct(CommandListHandlerInterface $handler)
     {
         $this->handler = $handler;
     }

@@ -3,7 +3,7 @@
 namespace Aa\AkeneoImport\MessageHandler;
 
 use Aa\AkeneoImport\ImportCommands\CommandInterface;
-use Aa\AkeneoImport\ImportCommands\CommandHandlerInterface;
+use Aa\AkeneoImport\ImportCommands\CommandsHandlerInterface;
 use Aa\AkeneoImport\ImportCommands\CommandList;
 use Aa\AkeneoImport\ImportCommands\Control\FinishImport;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
