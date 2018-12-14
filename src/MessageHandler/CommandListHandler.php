@@ -22,8 +22,6 @@ class CommandListHandler implements MessageHandlerInterface
     {
         // @todo: add logic for requeing / rejecting messages
 
-        sprintf('Got %d commands', count($commands));
-
         $this->handler->handle($commands);
     }
 }
