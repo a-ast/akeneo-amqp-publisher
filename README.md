@@ -1,3 +1,3 @@
-# Akeneo AMQP Publisher
+# Akeneo Import
 
-Message publisher for PIM entities.
+Library for product import to Akeneo PIM.
