@@ -11,11 +11,6 @@ use Aa\AkeneoImport\ImportCommands\Control\FinishImport;
 class Importer
 {
     /**
-     * @var CommandProviderInterface
-     */
-    private $provider;
-
-    /**
      * @var \Aa\AkeneoImport\CommandBus\CommandBusFactory
      */
     private $commandBusFactory;
