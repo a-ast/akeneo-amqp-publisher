@@ -5,13 +5,12 @@ namespace Aa\AkeneoImport\MessageHandler;
 use Aa\AkeneoImport\Exception\RejectMessageException;
 use Aa\AkeneoImport\ImportCommands\CommandListHandlerInterface;
 use Aa\AkeneoImport\ImportCommands\CommandListInterface;
-use Aa\AkeneoImport\ImportCommands\Exceptions\CommandHandlerException;
-use Aa\AkeneoImport\ImportCommands\Exceptions\RecoverableCommandHandlerException;
+use Aa\AkeneoImport\ImportCommands\Exception\CommandHandlerException;
+use Aa\AkeneoImport\ImportCommands\Exception\RecoverableCommandHandlerException;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
-use Symfony\Component\Messenger\Transport\AmqpExt\Exception\RejectMessageExceptionInterface;
 use Throwable;
 
-class CommandListHandler implements MessageHandlerInterface
+class CommandListMessageHandler implements MessageHandlerInterface
 {
     /**
      * @var CommandListHandlerInterface

@@ -29,10 +29,14 @@ class AccumulateCommandHandler implements MessageHandlerInterface
      */
     private $maxCommandCount;
 
-    public function __construct(MessageBusInterface $bus, int $maxCommandCount)
+    public function __construct(int $maxCommandCount)
+    {
+        $this->maxCommandCount = $maxCommandCount;
+    }
+
+    public function setMessageBus(MessageBusInterface $bus)
     {
         $this->bus = $bus;
-        $this->maxCommandCount = $maxCommandCount;
     }
 
     public function __invoke(CommandInterface $command)
