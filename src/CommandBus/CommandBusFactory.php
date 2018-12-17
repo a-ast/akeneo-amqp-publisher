@@ -17,7 +17,7 @@ class CommandBusFactory
     public function createCommandBus(CommandListHandlerInterface $handler): MessageBusInterface
     {
         $commandListHandler = new CommandListMessageHandler($handler);
-        $commandHandler = new AccumulateCommandHandler( 100);
+        $commandHandler = new AccumulateCommandHandler( 100, $handler->shouldKeepCommandOrder());
 
         $handlersLocator = new HandlersLocator([
             CommandListInterface::class => [ CommandListInterface::class => $commandListHandler],

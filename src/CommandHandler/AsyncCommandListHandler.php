@@ -25,4 +25,9 @@ class AsyncCommandListHandler implements CommandListHandlerInterface
 
         $this->sender->send($envelope);
     }
+
+    public function shouldKeepCommandOrder(): bool
+    {
+        return false;
+    }
 }

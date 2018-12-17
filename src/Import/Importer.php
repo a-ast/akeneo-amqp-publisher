@@ -20,17 +20,16 @@ class Importer
      */
     private $commandBusFactory;
 
-    public function __construct(CommandProviderInterface $provider, CommandBusFactory $commandBusFactory)
+    public function __construct(CommandBusFactory $commandBusFactory)
     {
-        $this->provider = $provider;
         $this->commandBusFactory = $commandBusFactory;
     }
 
-    public function import(CommandListHandlerInterface $handler)
+    public function import(CommandProviderInterface $provider, CommandListHandlerInterface $handler)
     {
         $bus = $this->commandBusFactory->createCommandBus($handler);
 
-        foreach ($this->provider->getCommands() as $command) {
+        foreach ($provider->getCommands() as $command) {
             $bus->dispatch($command);
         }
 

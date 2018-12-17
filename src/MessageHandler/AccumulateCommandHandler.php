@@ -29,9 +29,15 @@ class AccumulateCommandHandler implements MessageHandlerInterface
      */
     private $maxCommandCount;
 
-    public function __construct(int $maxCommandCount)
+    /**
+     * @var bool
+     */
+    private $shouldKeepCommandOrder;
+
+    public function __construct(int $maxCommandCount, bool $shouldKeepCommandOrder)
     {
         $this->maxCommandCount = $maxCommandCount;
+        $this->shouldKeepCommandOrder = $shouldKeepCommandOrder;
     }
 
     public function setMessageBus(MessageBusInterface $bus)
@@ -50,26 +56,34 @@ class AccumulateCommandHandler implements MessageHandlerInterface
         $commandClass = get_class($command);
         $this->commandAccumulator[$commandClass][] = $command;
 
-        if ($this->maxCommandCount <= count($this->commandAccumulator[$commandClass])) {
+        if ($this->maxCommandCount > count($this->commandAccumulator[$commandClass])) {
+            return;
+        }
 
-            $commandList = new CommandList($this->commandAccumulator[$commandClass]);
+        (true === $this->shouldKeepCommandOrder) ?
+            $this->dispatchAll() :
+            $this->dispatchCommandList($commandClass);
+    }
 
-            $this->bus->dispatch($commandList);
-
-            $this->commandAccumulator[$commandClass] = [];
+    protected function dispatchAll()
+    {
+        foreach (array_keys($this->commandAccumulator) as $commandClass) {
+            $this->dispatchCommandList($commandClass);
         }
     }
 
-    protected function dispatchAll(): void
+    protected function dispatchCommandList(string $commandClass)
     {
-        foreach ($this->commandAccumulator as $commands) {
+        if (!isset($this->commandAccumulator[$commandClass]) ||
+            !is_array($this->commandAccumulator[$commandClass]) ||
+            empty($this->commandAccumulator[$commandClass])) {
 
-            if (!is_array($commands) || empty($commands)) {
-                continue;
-            }
-
-            $commandList = new CommandList($commands);
-            $this->bus->dispatch($commandList);
+            return;
         }
+
+        $commandList = new CommandList($this->commandAccumulator[$commandClass]);
+        $this->bus->dispatch($commandList);
+
+        $this->commandAccumulator[$commandClass] = [];
     }
 }
