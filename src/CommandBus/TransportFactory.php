@@ -2,13 +2,14 @@
 
 namespace Aa\AkeneoImport\CommandBus;
 
-use Aa\AkeneoImport\CommandHandler\AsyncCommandListHandler;
-use Aa\AkeneoImport\ImportCommands\CommandListHandlerInterface;
 use Aa\AkeneoImport\Serializer\CommandListNormalizer;
 use Aa\AkeneoImport\Serializer\CommandNormalizer;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender;
+use Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransport;
 use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
+use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
+use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer as MessengerSerializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -18,7 +19,7 @@ use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 
-class AsyncCommandListHandlerFactory
+class TransportFactory
 {
     /**
      * @var string
@@ -36,28 +37,27 @@ class AsyncCommandListHandlerFactory
         $this->options = $options;
     }
 
-    public function createHandler(): CommandListHandlerInterface
+    public function createSender(): SenderInterface
     {
-        return new AsyncCommandListHandler($this->createSender());
-    }
-
-    protected function createSender(): SenderInterface
-    {
-        $connection = Connection::fromDsn($this->dsn, $this->options);
-
-        $symfonySerializer = $this->createSerializer();
-
-        $messengerSerializer = new MessengerSerializer($symfonySerializer);
+        $connection = $this->createConnection();
+        $messengerSerializer = $this->createMessengerSerializer();
 
         $sender = new AmqpSender($connection, $messengerSerializer);
 
         return $sender;
     }
 
-    /**
-     * @return \Symfony\Component\Serializer\Serializer
-     */
-    protected function createSerializer(): SymfonySerializer
+    public function createReceiver(): ReceiverInterface
+    {
+        $connection = $this->createConnection();
+        $messengerSerializer = $this->createMessengerSerializer();
+
+        $receiver = new AmqpReceiver($connection, $messengerSerializer);
+
+        return $receiver;
+    }
+
+    private function createSerializer(): SymfonySerializer
     {
         $normalizers = [
             new CommandListNormalizer(),
@@ -76,5 +76,20 @@ class AsyncCommandListHandlerFactory
         $symfonySerializer = new SymfonySerializer($normalizers, $encoders);
 
         return $symfonySerializer;
+    }
+
+    private function createConnection(): Connection
+    {
+        $connection = Connection::fromDsn($this->dsn, $this->options);
+
+        return $connection;
+    }
+
+    private function createMessengerSerializer(): MessengerSerializer
+    {
+        $symfonySerializer = $this->createSerializer();
+        $messengerSerializer = new MessengerSerializer($symfonySerializer);
+
+        return $messengerSerializer;
     }
 }
