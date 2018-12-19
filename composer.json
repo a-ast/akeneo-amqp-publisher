@@ -11,7 +11,8 @@
     "require": {
         "php": ">=7.1",
         "aa/akeneo-import-commands": "dev-master",
-        "symfony/amqp-pack": "^1.0"
+        "symfony/amqp-pack": "^1.0",
+        "enqueue/amqp-ext": "^0.9"
     },
     "autoload": {
         "psr-4": {
