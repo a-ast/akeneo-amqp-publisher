@@ -2,28 +2,27 @@
 
 namespace Aa\AkeneoImport\CommandHandler;
 
+use Aa\AkeneoImport\CommandBus\Transport\Sender;
 use Aa\AkeneoImport\ImportCommands\CommandListHandlerInterface;
 use Aa\AkeneoImport\ImportCommands\CommandListInterface;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
+
 
 class AsyncCommandListHandler implements CommandListHandlerInterface
 {
     /**
-     * @var \Symfony\Component\Messenger\Transport\Sender\SenderInterface
+     * @var Sender
      */
     private $sender;
 
-    public function __construct(SenderInterface $sender)
+    public function __construct(Sender $sender)
     {
         $this->sender = $sender;
     }
 
     public function handle(CommandListInterface $commands)
     {
-        $envelope = new Envelope($commands);
-
-        $this->sender->send($envelope);
+        $this->sender->send($commands);
     }
 
     public function shouldKeepCommandOrder(): bool
