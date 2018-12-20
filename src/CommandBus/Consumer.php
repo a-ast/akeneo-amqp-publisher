@@ -2,6 +2,7 @@
 
 namespace Aa\AkeneoImport\CommandBus;
 
+use Aa\AkeneoImport\CommandBus\Transport\Receiver;
 use Aa\AkeneoImport\ImportCommands\CommandListHandlerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
@@ -10,16 +11,16 @@ use Symfony\Component\Messenger\Worker;
 class Consumer
 {
     /**
-     * @var \Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface
+     * @var Receiver
      */
     private $receiver;
 
     /**
-     * @var \Aa\AkeneoImport\CommandBus\CommandBusFactory
+     * @var CommandBusFactory
      */
     private $busFactory;
 
-    public function __construct(ReceiverInterface $receiver, CommandBusFactory $busFactory)
+    public function __construct(Receiver $receiver, CommandBusFactory $busFactory)
     {
         $this->receiver = $receiver;
         $this->busFactory = $busFactory;
@@ -29,13 +30,12 @@ class Consumer
     {
         $bus = $this->busFactory->createCommandBus($handler);
 
-        $worker = new Worker($this->receiver, $bus);
-        try {
-            $worker->run();
-        } catch (\Exception $e) {
+        foreach ($this->receiver as $commandList) {
 
-            var_dump($e);
+            $bus->dispatch($commandList);
 
         }
+
+
     }
 }
