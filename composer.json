@@ -12,7 +12,9 @@
         "php": ">=7.1",
         "aa/akeneo-import-commands": "dev-master",
         "symfony/amqp-pack": "^1.0",
-        "enqueue/amqp-ext": "^0.9"
+        "enqueue/amqp-ext": "^0.9",
+        "enqueue/dsn": "^0.9.2",
+        "symfony/serializer": "^4.1"
     },
     "autoload": {
         "psr-4": {
@@ -23,5 +25,8 @@
         "psr-4": {
             "spec\\Aa\\AkeneoImport\\": "spec/"
         }
+    },
+    "require-dev": {
+        "phpspec/phpspec": "^5.1"
     }
 }
