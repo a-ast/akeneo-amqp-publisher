@@ -3,11 +3,12 @@
 namespace Aa\AkeneoImport\Serializer;
 
 use Aa\AkeneoImport\ImportCommands\CommandInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 
-class CommandNormalizer implements NormalizerInterface
+class CommandNormalizer implements NormalizerInterface, NormalizerAwareInterface
 {
     use NormalizerAwareTrait;
 

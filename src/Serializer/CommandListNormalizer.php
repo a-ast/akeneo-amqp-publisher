@@ -3,18 +3,14 @@
 namespace Aa\AkeneoImport\Serializer;
 
 use Aa\AkeneoImport\ImportCommands\CommandList;
-use Aa\AkeneoImport\ImportCommands\CommandListInterface;
-use Aa\AkeneoImport\ImportCommands\Product\UpdateProduct;
-use Symfony\Component\Serializer\Exception\CircularReferenceException;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
-use Symfony\Component\Serializer\SerializerInterface;
 
-class CommandListNormalizer implements DenormalizerInterface, NormalizerInterface
+class CommandListNormalizer implements DenormalizerInterface, DenormalizerAwareInterface, NormalizerInterface, NormalizerAwareInterface
 {
     use DenormalizerAwareTrait, NormalizerAwareTrait;
 

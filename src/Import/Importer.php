@@ -2,34 +2,32 @@
 
 namespace Aa\AkeneoImport\Import;
 
+use Aa\AkeneoImport\CommandBus\CommandBusFactory;
+use Aa\AkeneoImport\ImportCommands\CommandListHandlerInterface;
 use Aa\AkeneoImport\ImportCommands\CommandProviderInterface;
 use Aa\AkeneoImport\ImportCommands\Control\FinishImport;
-use Symfony\Component\Messenger\MessageBusInterface;
+
 
 class Importer
 {
     /**
-     * @var CommandProviderInterface
+     * @var \Aa\AkeneoImport\CommandBus\CommandBusFactory
      */
-    private $provider;
+    private $commandBusFactory;
 
-    /**
-     * @var MessageBusInterface
-     */
-    private $bus;
-
-    public function __construct(CommandProviderInterface $provider, MessageBusInterface $bus)
+    public function __construct(CommandBusFactory $commandBusFactory)
     {
-        $this->provider = $provider;
-        $this->bus = $bus;
+        $this->commandBusFactory = $commandBusFactory;
     }
 
-    public function import()
+    public function import(CommandProviderInterface $provider, CommandListHandlerInterface $handler)
     {
-        foreach ($this->provider->getCommands() as $command) {
-            $this->bus->dispatch($command);
+        $bus = $this->commandBusFactory->createCommandBus($handler);
+
+        foreach ($provider->getCommands() as $command) {
+            $bus->dispatch($command);
         }
 
-        $this->bus->dispatch(new FinishImport());
+        $bus->dispatch(new FinishImport());
     }
 }
