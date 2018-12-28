@@ -5,7 +5,6 @@ namespace Aa\AkeneoImport\CommandHandler;
 use Aa\AkeneoImport\CommandBus\Transport\Sender;
 use Aa\AkeneoImport\ImportCommands\CommandListHandlerInterface;
 use Aa\AkeneoImport\ImportCommands\CommandListInterface;
-use Symfony\Component\Messenger\Envelope;
 
 
 class AsyncCommandListHandler implements CommandListHandlerInterface

@@ -33,17 +33,22 @@ class TransportFactory
         $this->dsn = $dsn;
     }
 
-    public function createSender()
+    public function createSender(): Sender
     {
-        if (null === $this->context) {
-            $factory = new AmqpConnectionFactory($this->dsn);
-
-            $this->context = $factory->createContext();
-        }
+        $this->initializeContext();
 
         $sender = new Sender($this->context, $this->createSerializer());
 
         return $sender;
+    }
+
+    public function createReceiver(): Receiver
+    {
+        $this->initializeContext();
+
+        $receiver = new Receiver($this->context, $this->createSerializer());
+
+        return $receiver;
     }
 
     private function createSerializer(): SerializerInterface
@@ -65,5 +70,15 @@ class TransportFactory
         $serializer = new Serializer($normalizers, $encoders);
 
         return $serializer;
+    }
+
+    private function initializeContext(): void
+    {
+        if (null !== $this->context) {
+            return;
+        }
+
+        $factory = new AmqpConnectionFactory($this->dsn);
+        $this->context = $factory->createContext();
     }
 }

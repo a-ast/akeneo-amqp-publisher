@@ -3,6 +3,7 @@
 namespace Aa\AkeneoImport\Serializer;
 
 use Aa\AkeneoImport\ImportCommands\CommandList;
+use Aa\AkeneoImport\ImportCommands\CommandListInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
@@ -48,6 +49,6 @@ class CommandListNormalizer implements DenormalizerInterface, DenormalizerAwareI
 
     public function supportsNormalization($data, $format = null)
     {
-        return 'json' === $format && $data instanceof CommandList;
+        return 'json' === $format && $data instanceof CommandListInterface;
     }
 }

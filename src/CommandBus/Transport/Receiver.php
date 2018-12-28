@@ -2,7 +2,8 @@
 
 namespace Aa\AkeneoImport\CommandBus\Transport;
 
-use Aa\AkeneoImport\ImportCommands\CommandListInterface;
+use Aa\AkeneoImport\ImportCommands\CommandList;
+use Aa\AkeneoImport\ImportCommands\Exception\RecoverableCommandHandlerException;
 use Interop\Queue\Context;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -24,7 +25,7 @@ class Receiver
         $this->serializer = $serializer;
     }
 
-    public function receive(string $queueName): iterable
+    public function receive(string $queueName): \Generator
     {
         $queue = $this->context->createQueue($queueName);
 
@@ -42,12 +43,17 @@ class Receiver
             }
 
             $body = $message->getBody();
-            $commandList = $this->serializer->deserialize($body, CommandListInterface::class, 'json');
+            $commandList = $this->serializer->deserialize($body, CommandList::class, 'json');
 
             try {
                 yield $commandList;
 
                 $consumer->acknowledge($message);
+
+            } catch (RecoverableCommandHandlerException $e) {
+
+                // true for requeue
+                $consumer->reject($message, true);
 
             } catch (\Exception $e) {
 

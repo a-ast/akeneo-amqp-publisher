@@ -22,27 +22,8 @@ class CommandListMessageHandler implements MessageHandlerInterface
         $this->handler = $handler;
     }
 
-    /**
-     * @throws \Aa\AkeneoImport\Exception\RejectMessageException
-     * @throws \Throwable
-     */
     public function __invoke(CommandListInterface $commands)
     {
-        try {
-            $this->handler->handle($commands);
-
-        } catch (RecoverableCommandHandlerException $e) {
-
-            throw $e;
-
-        } catch (CommandHandlerException $e) {
-
-            throw new RejectMessageException($e->getMessage(), $e->getCode(), $e);
-
-        } catch (Throwable $e) {
-
-            throw $e;
-        }
-
+        $this->handler->handle($commands);
     }
 }
