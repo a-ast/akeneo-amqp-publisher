@@ -4,8 +4,6 @@ namespace Aa\AkeneoImport\CommandBus;
 
 use Aa\AkeneoImport\CommandBus\Transport\Receiver;
 use Aa\AkeneoImport\ImportCommand\CommandListHandlerInterface;
-use Aa\AkeneoImport\ImportCommand\Product\UpdateOrCreateProduct;
-
 
 class Consumer
 {
@@ -19,9 +17,9 @@ class Consumer
         $this->receiver = $receiver;
     }
 
-    public function consume(CommandListHandlerInterface $handler)
+    public function consume(CommandListHandlerInterface $handler, string $queueName)
     {
-        $receive = $this->receiver->receive(UpdateOrCreateProduct::class);
+        $receive = $this->receiver->receive($queueName);
 
         foreach ($receive as $commandList) {
 
