@@ -3,9 +3,9 @@
 namespace Aa\AkeneoImport\Import;
 
 use Aa\AkeneoImport\CommandBus\CommandBusFactory;
-use Aa\AkeneoImport\ImportCommands\CommandListHandlerInterface;
-use Aa\AkeneoImport\ImportCommands\CommandProviderInterface;
-use Aa\AkeneoImport\ImportCommands\Control\FinishImport;
+use Aa\AkeneoImport\ImportCommand\CommandListHandlerInterface;
+use Aa\AkeneoImport\ImportCommand\CommandProviderInterface;
+use Aa\AkeneoImport\ImportCommand\Control\FinishImport;
 
 
 class Importer

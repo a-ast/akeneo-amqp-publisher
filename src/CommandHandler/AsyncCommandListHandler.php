@@ -3,8 +3,8 @@
 namespace Aa\AkeneoImport\CommandHandler;
 
 use Aa\AkeneoImport\CommandBus\Transport\Sender;
-use Aa\AkeneoImport\ImportCommands\CommandListHandlerInterface;
-use Aa\AkeneoImport\ImportCommands\CommandListInterface;
+use Aa\AkeneoImport\ImportCommand\CommandListHandlerInterface;
+use Aa\AkeneoImport\ImportCommand\CommandListInterface;
 
 
 class AsyncCommandListHandler implements CommandListHandlerInterface

@@ -3,12 +3,9 @@
 namespace Aa\AkeneoImport\CommandBus;
 
 use Aa\AkeneoImport\CommandBus\Transport\Receiver;
-use Aa\AkeneoImport\ImportCommands\CommandListHandlerInterface;
-use Aa\AkeneoImport\ImportCommands\Product\UpdateProduct;
-use Aa\AkeneoImport\ImportCommands\ProductModel\UpdateProductModel;
-use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
-use Symfony\Component\Messenger\Worker;
+use Aa\AkeneoImport\ImportCommand\CommandListHandlerInterface;
+use Aa\AkeneoImport\ImportCommand\Product\UpdateOrCreateProduct;
+
 
 class Consumer
 {
@@ -24,7 +21,7 @@ class Consumer
 
     public function consume(CommandListHandlerInterface $handler)
     {
-        $receive = $this->receiver->receive(UpdateProduct::class);
+        $receive = $this->receiver->receive(UpdateOrCreateProduct::class);
 
         foreach ($receive as $commandList) {
 
@@ -35,12 +32,7 @@ class Consumer
             } catch (\Exception $e) {
 
                 $receive->throw($e);
-
-
             }
-
         }
-
-
     }
 }

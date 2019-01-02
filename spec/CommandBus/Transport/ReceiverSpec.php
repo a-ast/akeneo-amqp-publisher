@@ -4,7 +4,7 @@ namespace spec\Aa\AkeneoImport\CommandBus\Transport;
 
 use Aa\AkeneoImport\CommandBus\Consumer;
 use Aa\AkeneoImport\CommandBus\Transport\Receiver;
-use Aa\AkeneoImport\ImportCommands\CommandListInterface;
+use Aa\AkeneoImport\ImportCommand\CommandListInterface;
 use Interop\Queue\Context;
 use Interop\Queue\Message;
 use Interop\Queue\Producer;

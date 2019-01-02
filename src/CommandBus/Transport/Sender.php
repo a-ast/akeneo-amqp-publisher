@@ -2,7 +2,7 @@
 
 namespace Aa\AkeneoImport\CommandBus\Transport;
 
-use Aa\AkeneoImport\ImportCommands\CommandListInterface;
+use Aa\AkeneoImport\ImportCommand\CommandListInterface;
 use Enqueue\AmqpExt\AmqpContext;
 use Interop\Queue\Context;
 use Symfony\Component\Serializer\SerializerInterface;

@@ -2,10 +2,10 @@
 
 namespace Aa\AkeneoImport\MessageHandler;
 
-use Aa\AkeneoImport\ImportCommands\CommandInterface;
-use Aa\AkeneoImport\ImportCommands\CommandsHandlerInterface;
-use Aa\AkeneoImport\ImportCommands\CommandList;
-use Aa\AkeneoImport\ImportCommands\Control\FinishImport;
+use Aa\AkeneoImport\ImportCommand\CommandInterface;
+use Aa\AkeneoImport\ImportCommand\CommandsHandlerInterface;
+use Aa\AkeneoImport\ImportCommand\CommandList;
+use Aa\AkeneoImport\ImportCommand\Control\FinishImport;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 

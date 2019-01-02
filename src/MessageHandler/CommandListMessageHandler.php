@@ -3,10 +3,10 @@
 namespace Aa\AkeneoImport\MessageHandler;
 
 use Aa\AkeneoImport\Exception\RejectMessageException;
-use Aa\AkeneoImport\ImportCommands\CommandListHandlerInterface;
-use Aa\AkeneoImport\ImportCommands\CommandListInterface;
-use Aa\AkeneoImport\ImportCommands\Exception\CommandHandlerException;
-use Aa\AkeneoImport\ImportCommands\Exception\RecoverableCommandHandlerException;
+use Aa\AkeneoImport\ImportCommand\CommandListHandlerInterface;
+use Aa\AkeneoImport\ImportCommand\CommandListInterface;
+use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
+use Aa\AkeneoImport\ImportCommand\Exception\RecoverableCommandHandlerException;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Throwable;
 

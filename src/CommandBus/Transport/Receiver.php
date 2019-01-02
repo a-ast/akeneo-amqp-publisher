@@ -2,8 +2,8 @@
 
 namespace Aa\AkeneoImport\CommandBus\Transport;
 
-use Aa\AkeneoImport\ImportCommands\CommandList;
-use Aa\AkeneoImport\ImportCommands\Exception\RecoverableCommandHandlerException;
+use Aa\AkeneoImport\ImportCommand\CommandList;
+use Aa\AkeneoImport\ImportCommand\Exception\RecoverableCommandHandlerException;
 use Interop\Queue\Context;
 use Symfony\Component\Serializer\SerializerInterface;
 

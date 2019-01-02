@@ -3,7 +3,7 @@
 namespace spec\Aa\AkeneoImport\CommandBus\Transport;
 
 use Aa\AkeneoImport\CommandBus\Transport\Sender;
-use Aa\AkeneoImport\ImportCommands\CommandListInterface;
+use Aa\AkeneoImport\ImportCommand\CommandListInterface;
 use Interop\Queue\Context;
 use Interop\Queue\Message;
 use Interop\Queue\Producer;

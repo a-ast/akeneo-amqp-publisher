@@ -2,9 +2,9 @@
 
 namespace Aa\AkeneoImport\CommandBus;
 
-use Aa\AkeneoImport\ImportCommands\CommandInterface;
-use Aa\AkeneoImport\ImportCommands\CommandListHandlerInterface;
-use Aa\AkeneoImport\ImportCommands\CommandListInterface;
+use Aa\AkeneoImport\ImportCommand\CommandInterface;
+use Aa\AkeneoImport\ImportCommand\CommandListHandlerInterface;
+use Aa\AkeneoImport\ImportCommand\CommandListInterface;
 use Aa\AkeneoImport\MessageHandler\AccumulateCommandHandler;
 use Aa\AkeneoImport\MessageHandler\CommandListMessageHandler;
 use Symfony\Component\Messenger\Handler\HandlersLocator;

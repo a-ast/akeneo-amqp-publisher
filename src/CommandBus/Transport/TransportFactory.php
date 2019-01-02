@@ -2,8 +2,8 @@
 
 namespace Aa\AkeneoImport\CommandBus\Transport;
 
-use Aa\AkeneoImport\Serializer\CommandListNormalizer;
-use Aa\AkeneoImport\Serializer\CommandNormalizer;
+use Aa\AkeneoImport\Normalizer\CommandListNormalizer;
+use Aa\AkeneoImport\Normalizer\CommandNormalizer;
 use Enqueue\AmqpExt\AmqpConnectionFactory;
 use Interop\Queue\Context;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
