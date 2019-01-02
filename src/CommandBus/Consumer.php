@@ -30,6 +30,7 @@ class Consumer
             } catch (\Exception $e) {
 
                 $receive->throw($e);
+
             }
         }
     }

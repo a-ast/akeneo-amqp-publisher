@@ -4,6 +4,7 @@ namespace Aa\AkeneoImport\CommandBus\Transport;
 
 use Aa\AkeneoImport\ImportCommand\CommandList;
 use Aa\AkeneoImport\ImportCommand\Exception\RecoverableCommandHandlerException;
+use Interop\Amqp\Impl\AmqpQueue;
 use Interop\Queue\Context;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -28,7 +29,6 @@ class Receiver
     public function receive(string $queueName): \Generator
     {
         $queue = $this->context->createQueue($queueName);
-
         $consumer = $this->context->createConsumer($queue);
 
         $isConsuming = true;
@@ -55,11 +55,14 @@ class Receiver
                 // true for requeue
                 $consumer->reject($message, true);
 
+                yield;
+
             } catch (\Exception $e) {
 
                 // true for requeue
                 $consumer->reject($message, false);
 
+                yield;
             }
 
         }
