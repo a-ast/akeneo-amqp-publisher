@@ -24,13 +24,9 @@ class Consumer
         foreach ($receive as $commandList) {
 
             try {
-
                 $handler->handle($commandList);
-
             } catch (\Exception $e) {
-
                 $receive->throw($e);
-
             }
         }
     }
