@@ -3,7 +3,7 @@
 namespace Aa\AkeneoImport\MessageHandler;
 
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
-use Aa\AkeneoImport\ImportCommand\CommandsHandlerInterface;
+use Aa\AkeneoImport\ImportCommand\CommandsAwareInterface;
 use Aa\AkeneoImport\ImportCommand\CommandList;
 use Aa\AkeneoImport\ImportCommand\Control\FinishImport;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
@@ -53,26 +53,47 @@ class AccumulateCommandHandler implements MessageHandlerInterface
             return;
         }
 
+        $this->addCommand($command);
+
+        if ($command instanceof CommandsAwareInterface) {
+            foreach ($command->getExtraCommands() as $extraCommand) {
+                $this->addCommand($extraCommand);
+            }
+        }
+    }
+
+    private function addCommand(CommandInterface $command)
+    {
         $commandClass = get_class($command);
         $this->commandAccumulator[$commandClass][] = $command;
 
-        if ($this->maxCommandCount > count($this->commandAccumulator[$commandClass])) {
-            return;
-        }
-
-        (true === $this->shouldKeepCommandOrder) ?
-            $this->dispatchAll() :
-            $this->dispatchCommandList($commandClass);
+        $this->dispatchIfLimitReached();
     }
 
-    protected function dispatchAll()
+    private function dispatchIfLimitReached()
+    {
+        foreach ($this->commandAccumulator as $commandClass => $commands) {
+
+            if (count($commands) < $this->maxCommandCount) {
+                continue;
+            }
+
+            (true === $this->shouldKeepCommandOrder) ?
+                $this->dispatchAll() :
+                $this->dispatchCommandList($commandClass);
+
+            return;
+        }
+    }
+
+    private function dispatchAll()
     {
         foreach (array_keys($this->commandAccumulator) as $commandClass) {
             $this->dispatchCommandList($commandClass);
         }
     }
 
-    protected function dispatchCommandList(string $commandClass)
+    private function dispatchCommandList(string $commandClass)
     {
         if (!isset($this->commandAccumulator[$commandClass]) ||
             !is_array($this->commandAccumulator[$commandClass]) ||
