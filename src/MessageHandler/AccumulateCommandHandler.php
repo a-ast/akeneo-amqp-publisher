@@ -4,7 +4,7 @@ namespace Aa\AkeneoImport\MessageHandler;
 
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\CommandsAwareInterface;
-use Aa\AkeneoImport\ImportCommand\CommandList;
+use Aa\AkeneoImport\ImportCommand\CommandBatch;
 use Aa\AkeneoImport\ImportCommand\Control\FinishImport;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -102,7 +102,7 @@ class AccumulateCommandHandler implements MessageHandlerInterface
             return;
         }
 
-        $commandList = new CommandList($this->commandAccumulator[$commandClass]);
+        $commandList = new CommandBatch($this->commandAccumulator[$commandClass]);
         $this->bus->dispatch($commandList);
 
         $this->commandAccumulator[$commandClass] = [];

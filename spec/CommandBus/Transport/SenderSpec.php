@@ -3,7 +3,7 @@
 namespace spec\Aa\AkeneoImport\CommandBus\Transport;
 
 use Aa\AkeneoImport\CommandBus\Transport\Sender;
-use Aa\AkeneoImport\ImportCommand\CommandListInterface;
+use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
 use Interop\Queue\Context;
 use Interop\Queue\Message;
 use Interop\Queue\Producer;
@@ -24,7 +24,7 @@ class SenderSpec extends ObjectBehavior
         $this->shouldHaveType(Sender::class);
     }
 
-    function it_sends_command_lists(CommandListInterface $commandList, Context $context,
+    function it_sends_command_lists(CommandBatchInterface $commandList, Context $context,
         SerializerInterface $serializer, Producer $producer, Queue $queue, Message $message
     ) {
         $commandList->getCommandClass()->willReturn('Aa\\Commands\\Command');

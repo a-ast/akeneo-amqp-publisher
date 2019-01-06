@@ -2,7 +2,7 @@
 
 namespace Aa\AkeneoImport\CommandBus\Transport;
 
-use Aa\AkeneoImport\ImportCommand\CommandList;
+use Aa\AkeneoImport\ImportCommand\CommandBatch;
 use Aa\AkeneoImport\ImportCommand\Exception\RecoverableCommandHandlerException;
 use Interop\Amqp\Impl\AmqpQueue;
 use Interop\Queue\Context;
@@ -43,7 +43,7 @@ class Receiver
             }
 
             $body = $message->getBody();
-            $commandList = $this->serializer->deserialize($body, CommandList::class, 'json');
+            $commandList = $this->serializer->deserialize($body, CommandBatch::class, 'json');
 
             try {
                 yield $commandList;

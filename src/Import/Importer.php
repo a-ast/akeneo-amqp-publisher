@@ -3,7 +3,7 @@
 namespace Aa\AkeneoImport\Import;
 
 use Aa\AkeneoImport\CommandBus\CommandBusFactory;
-use Aa\AkeneoImport\ImportCommand\CommandListHandlerInterface;
+use Aa\AkeneoImport\ImportCommand\CommandBatchHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandProviderInterface;
 use Aa\AkeneoImport\ImportCommand\Control\FinishImport;
 
@@ -20,7 +20,7 @@ class Importer
         $this->commandBusFactory = $commandBusFactory;
     }
 
-    public function import(CommandProviderInterface $provider, CommandListHandlerInterface $handler)
+    public function import(CommandProviderInterface $provider, CommandBatchHandlerInterface $handler)
     {
         // @todo: generate import id and send with envelope
 

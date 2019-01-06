@@ -4,7 +4,7 @@ namespace spec\Aa\AkeneoImport\CommandBus\Transport;
 
 use Aa\AkeneoImport\CommandBus\Consumer;
 use Aa\AkeneoImport\CommandBus\Transport\Receiver;
-use Aa\AkeneoImport\ImportCommand\CommandListInterface;
+use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
 use Interop\Queue\Context;
 use Interop\Queue\Message;
 use Interop\Queue\Producer;
@@ -25,7 +25,7 @@ class ReceiverSpec extends ObjectBehavior
         $this->shouldHaveType(Receiver::class);
     }
 
-    function it_receives_command_lists(CommandListInterface $commandList, Context $context,
+    function it_receives_command_lists(CommandBatchInterface $commandList, Context $context,
         SerializerInterface $serializer, Consumer $consumer, Queue $queue, Message $message
     ) {
         $queueName = 'Aa\\Commands\\Command';

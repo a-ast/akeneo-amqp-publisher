@@ -3,11 +3,11 @@
 namespace Aa\AkeneoImport\CommandHandler;
 
 use Aa\AkeneoImport\CommandBus\Transport\Sender;
-use Aa\AkeneoImport\ImportCommand\CommandListHandlerInterface;
-use Aa\AkeneoImport\ImportCommand\CommandListInterface;
+use Aa\AkeneoImport\ImportCommand\CommandBatchHandlerInterface;
+use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
 
 
-class AsyncCommandListHandler implements CommandListHandlerInterface
+class AsyncCommandBatchHandler implements CommandBatchHandlerInterface
 {
     /**
      * @var Sender
@@ -19,7 +19,7 @@ class AsyncCommandListHandler implements CommandListHandlerInterface
         $this->sender = $sender;
     }
 
-    public function handle(CommandListInterface $commands)
+    public function handle(CommandBatchInterface $commands)
     {
         $this->sender->send($commands);
     }

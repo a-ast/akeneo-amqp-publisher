@@ -2,7 +2,7 @@
 
 namespace Aa\AkeneoImport\CommandBus\Transport;
 
-use Aa\AkeneoImport\ImportCommand\CommandListInterface;
+use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
 use Enqueue\AmqpExt\AmqpContext;
 use Interop\Amqp\Impl\AmqpQueue;
 use Interop\Queue\Context;
@@ -26,7 +26,7 @@ class Sender
         $this->serializer = $serializer;
     }
 
-    public function send(CommandListInterface $commandList)
+    public function send(CommandBatchInterface $commandList)
     {
         $producer = $this->context->createProducer();
         $queue = $this->context->createQueue($commandList->getCommandClass());
