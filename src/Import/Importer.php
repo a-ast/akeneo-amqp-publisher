@@ -22,6 +22,8 @@ class Importer
 
     public function import(CommandProviderInterface $provider, CommandListHandlerInterface $handler)
     {
+        // @todo: generate import id and send with envelope
+
         $bus = $this->commandBusFactory->createCommandBus($handler);
 
         foreach ($provider->getCommands() as $command) {
