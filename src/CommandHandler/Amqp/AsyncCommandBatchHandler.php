@@ -1,6 +1,6 @@
 <?php
 
-namespace Aa\AkeneoImport\CommandHandler;
+namespace Aa\AkeneoImport\CommandHandler\Amqp;
 
 use Aa\AkeneoImport\CommandBus\Transport\Sender;
 use Aa\AkeneoImport\ImportCommand\CommandBatchHandlerInterface;

@@ -11,11 +11,13 @@
     "require": {
         "php": ">=7.1",
         "aa/akeneo-import-commands": "dev-master",
+        "akeneo/api-php-client": "^3.0",
         "enqueue/amqp-ext": "^0.9",
         "enqueue/dsn": "^0.9.2",
         "symfony/serializer": "^4.2",
         "symfony/property-access": "^4.2",
-        "symfony/messenger": "^4.2"
+        "symfony/messenger": "^4.2",
+        "php-http/guzzle6-adapter": "^1.1"
     },
     "autoload": {
         "psr-4": {
