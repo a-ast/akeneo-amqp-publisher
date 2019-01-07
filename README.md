@@ -4,6 +4,8 @@ Library for data import to Akeneo PIM.
 
 @todo: preword about commands - https://martinfowler.com/bliki/CommandQuerySeparation.html
 
+!Note: examples don't yet reflect the current state of the lib.
+
 ## Usage example
 
 ### Create a simple product directly via API
