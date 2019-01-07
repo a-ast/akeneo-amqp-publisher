@@ -26,17 +26,17 @@ class Sender
         $this->serializer = $serializer;
     }
 
-    public function send(CommandBatchInterface $commandList)
+    public function send(CommandBatchInterface $commandBatch)
     {
         $producer = $this->context->createProducer();
-        $queue = $this->context->createQueue($commandList->getCommandClass());
+        $queue = $this->context->createQueue($commandBatch->getCommandClass());
         $queue->addFlag(AmqpQueue::FLAG_DURABLE);
 
         if ($this->context instanceof AmqpContext) {
             $this->context->declareQueue($queue);
         }
 
-        $body = $this->serializer->serialize($commandList, 'json');
+        $body = $this->serializer->serialize($commandBatch, 'json');
 
         $message = $this->context->createMessage($body);
 

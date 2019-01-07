@@ -2,7 +2,7 @@
 
 namespace Aa\AkeneoImport\CommandBus\Transport;
 
-use Aa\AkeneoImport\Normalizer\CommandListNormalizer;
+use Aa\AkeneoImport\Normalizer\CommandBatchNormalizer;
 use Aa\AkeneoImport\Normalizer\CommandNormalizer;
 use Enqueue\AmqpExt\AmqpConnectionFactory;
 use Interop\Queue\Context;
@@ -54,7 +54,7 @@ class TransportFactory
     private function createSerializer(): SerializerInterface
     {
         $normalizers = [
-            new CommandListNormalizer(),
+            new CommandBatchNormalizer(),
             new CommandNormalizer(),
             new JsonSerializableNormalizer(),
             new DateTimeNormalizer(),

@@ -6,7 +6,7 @@ use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\CommandBatchHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
 use Aa\AkeneoImport\MessageHandler\AccumulateCommandHandler;
-use Aa\AkeneoImport\MessageHandler\CommandListMessageHandler;
+use Aa\AkeneoImport\MessageHandler\CommandBatchMessageHandler;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -16,11 +16,11 @@ class CommandBusFactory
 {
     public function createCommandBus(CommandBatchHandlerInterface $handler): MessageBusInterface
     {
-        $commandListHandler = new CommandListMessageHandler($handler);
+        $commandBatchHandler = new CommandBatchMessageHandler($handler);
         $commandHandler = new AccumulateCommandHandler( 100, $handler->shouldKeepCommandOrder());
 
         $handlersLocator = new HandlersLocator([
-            CommandBatchInterface::class => [ CommandBatchInterface::class => $commandListHandler],
+            CommandBatchInterface::class => [ CommandBatchInterface::class => $commandBatchHandler],
             CommandInterface::class => [ CommandInterface::class => $commandHandler],
         ]);
 

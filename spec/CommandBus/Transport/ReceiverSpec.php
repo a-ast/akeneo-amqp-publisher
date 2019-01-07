@@ -25,13 +25,13 @@ class ReceiverSpec extends ObjectBehavior
         $this->shouldHaveType(Receiver::class);
     }
 
-    function it_receives_command_lists(CommandBatchInterface $commandList, Context $context,
-        SerializerInterface $serializer, Consumer $consumer, Queue $queue, Message $message
+    function it_receives_command_batch(CommandBatchInterface $commandBatch, Context $context,
+        SerializerInterface $serializer, Consumer $consumer, Queue $queue
     ) {
         $queueName = 'Aa\\Commands\\Command';
-        $commandList->getCommandClass()->willReturn($queueName);
+        $commandBatch->getCommandClass()->willReturn($queueName);
 
-        $serializer->deserialize(Argument::any(), $queueName, 'json')->willReturn($commandList);
+        $serializer->deserialize(Argument::any(), $queueName, 'json')->willReturn($commandBatch);
 
         $context->createQueue(Argument::type('string'))->willReturn($queue);
         $context->createConsumer($queue)->willReturn($consumer);

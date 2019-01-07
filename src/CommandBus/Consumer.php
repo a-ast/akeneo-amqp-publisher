@@ -21,10 +21,10 @@ class Consumer
     {
         $receive = $this->receiver->receive($queueName);
 
-        foreach ($receive as $commandList) {
+        foreach ($receive as $commandBatch) {
 
             try {
-                $handler->handle($commandList);
+                $handler->handle($commandBatch);
             } catch (\Exception $e) {
                 $receive->throw($e);
             }

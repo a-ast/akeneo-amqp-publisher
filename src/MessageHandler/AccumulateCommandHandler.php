@@ -80,7 +80,7 @@ class AccumulateCommandHandler implements MessageHandlerInterface
 
             (true === $this->shouldKeepCommandOrder) ?
                 $this->dispatchAll() :
-                $this->dispatchCommandList($commandClass);
+                $this->dispatchCommandBatch($commandClass);
 
             return;
         }
@@ -89,11 +89,11 @@ class AccumulateCommandHandler implements MessageHandlerInterface
     private function dispatchAll()
     {
         foreach (array_keys($this->commandAccumulator) as $commandClass) {
-            $this->dispatchCommandList($commandClass);
+            $this->dispatchCommandBatch($commandClass);
         }
     }
 
-    private function dispatchCommandList(string $commandClass)
+    private function dispatchCommandBatch(string $commandClass)
     {
         if (!isset($this->commandAccumulator[$commandClass]) ||
             !is_array($this->commandAccumulator[$commandClass]) ||
@@ -102,8 +102,8 @@ class AccumulateCommandHandler implements MessageHandlerInterface
             return;
         }
 
-        $commandList = new CommandBatch($this->commandAccumulator[$commandClass]);
-        $this->bus->dispatch($commandList);
+        $commandBatch = new CommandBatch($this->commandAccumulator[$commandClass]);
+        $this->bus->dispatch($commandBatch);
 
         $this->commandAccumulator[$commandClass] = [];
     }

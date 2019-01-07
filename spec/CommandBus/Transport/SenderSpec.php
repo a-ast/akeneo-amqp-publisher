@@ -24,17 +24,17 @@ class SenderSpec extends ObjectBehavior
         $this->shouldHaveType(Sender::class);
     }
 
-    function it_sends_command_lists(CommandBatchInterface $commandList, Context $context,
+    function it_sends_command_batch(CommandBatchInterface $commandBatch, Context $context,
         SerializerInterface $serializer, Producer $producer, Queue $queue, Message $message
     ) {
-        $commandList->getCommandClass()->willReturn('Aa\\Commands\\Command');
+        $commandBatch->getCommandClass()->willReturn('Aa\\Commands\\Command');
 
-        $serializer->serialize($commandList, 'json')->willReturn('serialized message');
+        $serializer->serialize($commandBatch, 'json')->willReturn('serialized message');
 
         $context->createProducer()->willReturn($producer);
         $context->createQueue(Argument::type('string'))->willReturn($queue);
         $context->createMessage(Argument::type('string'))->willReturn($message);
 
-        $this->send($commandList);
+        $this->send($commandBatch);
     }
 }

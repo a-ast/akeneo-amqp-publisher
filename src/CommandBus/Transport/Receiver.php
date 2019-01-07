@@ -43,10 +43,10 @@ class Receiver
             }
 
             $body = $message->getBody();
-            $commandList = $this->serializer->deserialize($body, CommandBatch::class, 'json');
+            $commandBatch = $this->serializer->deserialize($body, CommandBatch::class, 'json');
 
             try {
-                yield $commandList;
+                yield $commandBatch;
 
                 $consumer->acknowledge($message);
 
