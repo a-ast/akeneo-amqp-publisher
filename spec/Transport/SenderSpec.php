@@ -1,14 +1,13 @@
 <?php
 
-namespace spec\Aa\AkeneoImport\CommandBus\Transport;
+namespace spec\Aa\AkeneoImport\Transport;
 
-use Aa\AkeneoImport\CommandBus\Transport\Sender;
+use Aa\AkeneoImport\Transport\Sender;
 use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
 use Interop\Amqp\AmqpQueue;
 use Interop\Queue\Context;
 use Interop\Queue\Message;
 use Interop\Queue\Producer;
-use Interop\Queue\Queue;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\SerializerInterface;

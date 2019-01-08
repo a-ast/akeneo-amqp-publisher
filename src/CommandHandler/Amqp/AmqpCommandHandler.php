@@ -2,12 +2,12 @@
 
 namespace Aa\AkeneoImport\CommandHandler\Amqp;
 
-use Aa\AkeneoImport\CommandBus\Transport\Sender;
+use Aa\AkeneoImport\Transport\Sender;
 use Aa\AkeneoImport\ImportCommand\CommandBatchHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
 
 
-class AsyncCommandBatchHandler implements CommandBatchHandlerInterface
+class AmqpCommandHandler implements CommandBatchHandlerInterface
 {
     /**
      * @var Sender

@@ -1,6 +1,6 @@
 <?php
 
-namespace Aa\AkeneoImport\CommandBus\Transport;
+namespace Aa\AkeneoImport\Transport;
 
 use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
 use Enqueue\AmqpExt\AmqpContext;

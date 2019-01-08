@@ -1,13 +1,11 @@
 <?php
 
-namespace spec\Aa\AkeneoImport\CommandBus\Transport;
+namespace spec\Aa\AkeneoImport\Transport;
 
 use Aa\AkeneoImport\CommandBus\Consumer;
-use Aa\AkeneoImport\CommandBus\Transport\Receiver;
+use Aa\AkeneoImport\Transport\Receiver;
 use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
 use Interop\Queue\Context;
-use Interop\Queue\Message;
-use Interop\Queue\Producer;
 use Interop\Queue\Queue;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;

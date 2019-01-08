@@ -3,7 +3,7 @@
 namespace spec\Aa\AkeneoImport\CommandHandler\Api\Api;
 
 use Aa\AkeneoImport\CommandHandler\Api\ApiAdapter\ApiAdapterInterface;
-use Aa\AkeneoImport\CommandHandler\Api\ApiBatchHandler;
+use Aa\AkeneoImport\CommandHandler\Api\ApiCommandHandler;
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\Response;
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\ValidatorInterface;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
@@ -31,7 +31,7 @@ class ApiBatchHandlerSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType(ApiBatchHandler::class);
+        $this->shouldHaveType(ApiCommandHandler::class);
     }
 
     function it_fails_for_empty_command_list()

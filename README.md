@@ -15,15 +15,12 @@ Library for data import to Akeneo PIM.
 $command = new UpdateOrCreateProduct('tshirt-red-xl');
 
 $importerFactory = new ImporterFactory();
-$importer => $importerFactory->build();
-// @todo: wow, factory to hide dependencies?
+$importer => $importerFactory->create();
 
+$handlerFactory = new ApiCommandHandlerFactory();
+$handler = $apiHandlerFactory->createByCredentials('http://akeneo', 'client_id', 'secret', 'user', 'pass');
 
-$apiHandlerFactory = new ApiBatchHandlerFactory();
-$apiHandler = $apiHandlerFactory->buildByCredentials('http://akeneo', 'client_id', 'secret', 'user', 'pass');
-// @todo: remove required dependency
-
-$importer->import(new ArrayObject([$command]), $apiHandler);
+$importer->import(new ArrayObject([$command]), $handler);
 
 ``` 
 
@@ -36,10 +33,10 @@ $command = new UpdateOrCreateProduct('tshirt-red-xl');
 $importerFactory = new ImporterFactory();
 $importer => $importerFactory->create();
 
-$amqpHandlerFactory = new AmqpHandlerFactory();
-$amqpHandler = $amqpHandlerFactory->createByDsn('dsn://mq');
+$handlerFactory = new AmqpCommandHandlerFactory();
+$handler = $handlerFactory->createByDsn('dsn://mq');
 
-$importer->import(new ArrayObject([$command]), $amqpHandler);
+$importer->import(new ArrayObject([$command]), $handler);
 
 ``` 
 

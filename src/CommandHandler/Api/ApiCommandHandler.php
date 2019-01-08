@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Throwable;
 
 
-class ApiBatchHandler implements CommandBatchHandlerInterface
+class ApiCommandHandler implements CommandBatchHandlerInterface
 {
     /**
      * @var AkeneoPimClientInterface

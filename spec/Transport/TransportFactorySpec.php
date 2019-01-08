@@ -1,9 +1,9 @@
 <?php
 
-namespace spec\Aa\AkeneoImport\CommandBus\Transport;
+namespace spec\Aa\AkeneoImport\Transport;
 
-use Aa\AkeneoImport\CommandBus\Transport\Sender;
-use Aa\AkeneoImport\CommandBus\Transport\TransportFactory;
+use Aa\AkeneoImport\Transport\Sender;
+use Aa\AkeneoImport\Transport\TransportFactory;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 

@@ -2,7 +2,7 @@
 
 namespace Aa\AkeneoImport\CommandBus;
 
-use Aa\AkeneoImport\CommandBus\Transport\Receiver;
+use Aa\AkeneoImport\Transport\Receiver;
 use Aa\AkeneoImport\ImportCommand\CommandBatchHandlerInterface;
 
 class Consumer

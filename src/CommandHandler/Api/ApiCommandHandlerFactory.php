@@ -7,6 +7,7 @@ use Aa\AkeneoImport\CommandHandler\Api\ApiAdapter\UpsertableApiAdapter;
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\Validator;
 use Aa\AkeneoImport\Normalizer\CommandBatchNormalizer;
 use Aa\AkeneoImport\Normalizer\CommandNormalizer;
+use Akeneo\Pim\ApiClient\AkeneoPimClientBuilder;
 use Akeneo\Pim\ApiClient\AkeneoPimClientInterface;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
@@ -15,27 +16,12 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
-class ApiBatchHandlerFactory
+class ApiCommandHandlerFactory
 {
-
-    /**
-     * @var AkeneoPimClientInterface
-     */
-    private $client;
-
-    /**
-     * @var NormalizerInterface
-     */
-    private $normalizer;
-
-    public function __construct(AkeneoPimClientInterface $client)
+    public function createByApiClient(AkeneoPimClientInterface $client): ApiCommandHandler
     {
-        $this->client = $client;
-        $this->normalizer = $this->createSerializer();
-    }
+        $normalizer = $this->createSerializer();
 
-    public function createHandler()
-    {
         $apiAdapters = [
             new UpsertableApiAdapter(),
             new MediaApiAdapter(),
@@ -43,7 +29,15 @@ class ApiBatchHandlerFactory
 
         $validator = new Validator();
 
-        return new ApiBatchHandler($this->client, $this->normalizer, $apiAdapters, $validator);
+        return new ApiCommandHandler($client, $normalizer, $apiAdapters, $validator);
+    }
+
+    public function createByCredentials(string $baseUri, string $clientId, string $secret, string $username, string $password): ApiCommandHandler
+    {
+        $clientBuilder = new AkeneoPimClientBuilder($baseUri);
+        $client = $clientBuilder->buildAuthenticatedByPassword($clientId, $secret, $username, $password);
+
+        return $this->createByApiClient($client);
     }
 
     private function createSerializer(): NormalizerInterface
