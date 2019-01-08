@@ -18,7 +18,7 @@ $importerFactory = new ImporterFactory();
 $importer => $importerFactory->create();
 
 $handlerFactory = new ApiCommandHandlerFactory();
-$handler = $apiHandlerFactory->createByCredentials('http://akeneo', 'client_id', 'secret', 'user', 'pass');
+$handler = $handlerFactory->createByCredentials('http://akeneo', 'client_id', 'secret', 'user', 'pass');
 
 $importer->import(new ArrayObject([$command]), $handler);
 
@@ -46,16 +46,11 @@ To read messages and create products using Akeneo API you would need a consumer:
 ```php
 
 $consumerFactory = new ConsumerFactory();
-$consumer => $consumerFactory->create();
-// $consumer = new Consumer();
+$consumer => $consumerFactory->createByDsn('dsn://mq');
 
+$handlerFactory = new ApiCommandHandlerFactory();
+$handler = $handlerFactory->createByCredentials('http://akeneo', 'client_id', 'secret', 'user', 'pass');
 
-// @todo: wow, factory to hide dependencies?
-
-
-$apiHandlerFactory = new ApiBatchHandlerFactory();
-$apiHandler = $apiHandlerFactory->buildByCredentials('http://akeneo', 'client_id', 'secret', 'user', 'pass');
-
-$importer->import(new ArrayObject([$command]), $apiHandler);
+$importer->import(new ArrayObject([$command]), $handler);
 
 ```  

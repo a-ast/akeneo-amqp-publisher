@@ -2,9 +2,9 @@
 
 namespace spec\Aa\AkeneoImport\Transport;
 
-use Aa\AkeneoImport\CommandBus\Consumer;
 use Aa\AkeneoImport\Transport\Receiver;
 use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
+use Interop\Queue\Consumer;
 use Interop\Queue\Context;
 use Interop\Queue\Queue;
 use PhpSpec\ObjectBehavior;

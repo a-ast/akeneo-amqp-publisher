@@ -1,8 +1,7 @@
 <?php
 
-namespace Aa\AkeneoImport\CommandBus;
+namespace Aa\AkeneoImport\Transport;
 
-use Aa\AkeneoImport\Transport\Receiver;
 use Aa\AkeneoImport\ImportCommand\CommandBatchHandlerInterface;
 
 class Consumer
