@@ -3,9 +3,9 @@ language: php
 php:
   - 7.1
 
-before_install: phpenv config-add myconfig.ini
-
 install:
+  - php ./fix_composer_json.php
+  - composer self-update
   - composer install --prefer-source --no-interaction --dev
 
 script:
