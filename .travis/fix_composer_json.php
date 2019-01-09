@@ -1,6 +1,6 @@
 <?php
 
-$composerFilePath = '/composer.json';
+$composerFilePath = '/../composer.json';
 
 copy(__DIR__.$composerFilePath, __DIR__.'/../composer.json.bak');
 

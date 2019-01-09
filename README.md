@@ -1,5 +1,7 @@
 # Akeneo Import
 
+[![Build Status](https://travis-ci.org/a-ast/akeneo-import.svg?branch=master)](https://travis-ci.org/a-ast/akeneo-import)
+
 Akeneo Import simplifies data import to Akeneo PIM.
 
 Using this library you can create easy-to-use commands to modify product data and related PIM entities
