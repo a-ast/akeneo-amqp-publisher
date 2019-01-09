@@ -3,8 +3,7 @@ language: php
 php:
   - 7.1
 
-before_install:
-  - printf "\n" | pecl install amqp
+before_install: phpenv config-add myconfig.ini
 
 install:
   - composer install --prefer-source --no-interaction --dev
