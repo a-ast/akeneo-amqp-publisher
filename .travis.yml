@@ -3,8 +3,7 @@ language: php
 php:
   - 7.1
 
-before_install:
-  - echo "extension = amqp.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+before_install: echo "extension = amqp.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 install:
   - composer install --prefer-source --no-interaction --dev
