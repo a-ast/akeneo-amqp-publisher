@@ -3,11 +3,11 @@
 namespace Aa\AkeneoImport\CommandHandler\Amqp;
 
 use Aa\AkeneoImport\Transport\Sender;
-use Aa\AkeneoImport\ImportCommand\CommandBatchHandlerInterface;
+use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
 
 
-class AmqpCommandHandler implements CommandBatchHandlerInterface
+class AmqpCommandHandler implements CommandHandlerInterface
 {
     /**
      * @var Sender

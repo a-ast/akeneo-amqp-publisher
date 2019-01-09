@@ -4,7 +4,6 @@ namespace Aa\AkeneoImport\Transport;
 
 use Aa\AkeneoImport\ImportCommand\CommandBatch;
 use Aa\AkeneoImport\ImportCommand\Exception\RecoverableCommandHandlerException;
-use Interop\Amqp\Impl\AmqpQueue;
 use Interop\Queue\Context;
 use Symfony\Component\Serializer\SerializerInterface;
 

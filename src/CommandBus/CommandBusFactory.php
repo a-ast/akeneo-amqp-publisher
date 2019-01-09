@@ -3,7 +3,7 @@
 namespace Aa\AkeneoImport\CommandBus;
 
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
-use Aa\AkeneoImport\ImportCommand\CommandBatchHandlerInterface;
+use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
 use Aa\AkeneoImport\MessageHandler\AccumulateCommandHandler;
 use Aa\AkeneoImport\MessageHandler\CommandBatchMessageHandler;
@@ -14,7 +14,7 @@ use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 
 class CommandBusFactory
 {
-    public function createCommandBus(CommandBatchHandlerInterface $handler): MessageBusInterface
+    public function createCommandBus(CommandHandlerInterface $handler): MessageBusInterface
     {
         $commandBatchHandler = new CommandBatchMessageHandler($handler);
         $commandHandler = new AccumulateCommandHandler( 100, $handler->shouldKeepCommandOrder());

@@ -2,7 +2,7 @@
 
 namespace Aa\AkeneoImport\Transport;
 
-use Aa\AkeneoImport\ImportCommand\CommandBatchHandlerInterface;
+use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 
 class Consumer
 {
@@ -16,7 +16,7 @@ class Consumer
         $this->receiver = $receiver;
     }
 
-    public function consume(CommandBatchHandlerInterface $handler, string $queueName)
+    public function consume(CommandHandlerInterface $handler, string $queueName)
     {
         $receive = $this->receiver->receive($queueName);
 

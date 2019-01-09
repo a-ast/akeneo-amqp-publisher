@@ -4,17 +4,16 @@ namespace spec\Aa\AkeneoImport\Import;
 
 use Aa\AkeneoImport\CommandBus\CommandBusFactory;
 use Aa\AkeneoImport\Import\Importer;
-use Aa\AkeneoImport\ImportCommand\CommandBatchHandlerInterface;
+use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-use spec\Aa\AkeneoImport\fixture\TestCommand;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class ImporterSpec extends ObjectBehavior
 {
     function let(CommandBusFactory $factory,
-        CommandBatchHandlerInterface $handler,
+        CommandHandlerInterface $handler,
         MessageBusInterface $bus
     ) {
         $factory->createCommandBus($handler)->willReturn($bus);
@@ -28,12 +27,12 @@ class ImporterSpec extends ObjectBehavior
         $this->shouldHaveType(Importer::class);
     }
 
-    function it_imports_array_of_command(CommandBatchHandlerInterface $handler)
+    function it_imports_array_of_command(CommandHandlerInterface $handler)
     {
         $this->import([], $handler);
     }
 
-    function it_imports_commands_provided_by_generator(CommandBatchHandlerInterface $handler)
+    function it_imports_commands_provided_by_generator(CommandHandlerInterface $handler)
     {
         $generator = new class {
 

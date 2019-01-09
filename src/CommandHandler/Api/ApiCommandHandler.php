@@ -6,7 +6,7 @@ use Aa\AkeneoImport\CommandHandler\Api\ApiAdapter\ApiAdapterInterface;
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\Exception\TolerantValidationException;
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\ValidatorInterface;
 use Aa\AkeneoImport\ImportCommand\Category\UpdateOrCreateCategory;
-use Aa\AkeneoImport\ImportCommand\CommandBatchHandlerInterface;
+use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
 use Aa\AkeneoImport\ImportCommand\Exception\RecoverableCommandHandlerException;
@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Throwable;
 
 
-class ApiCommandHandler implements CommandBatchHandlerInterface
+class ApiCommandHandler implements CommandHandlerInterface
 {
     /**
      * @var AkeneoPimClientInterface
