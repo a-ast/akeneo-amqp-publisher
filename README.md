@@ -1,17 +1,33 @@
 # Akeneo Import
 
-Library for data import to Akeneo PIM.
+Akeneo Import is a library that simplifies data import to Akeneo PIM.
 
-@todo: preword about commands - https://martinfowler.com/bliki/CommandQuerySeparation.html
+Using this library you can create easy-to-use commands to modify product data and related PIM entities
+like categories.
+It supports synchronous import via Akeneo API or asynchronous import 
+using a message broker like RabbitMQ.
 
-!Note: examples don't yet reflect the current state of the lib.
 
-## Usage example
+## How you can use it
+
+* Import from external systems (legacy PIM or regular data provider). 
+* Mass media file import. 
+* Import from older Akeneo versions.
+* Data generation for testing, local development or performance benchmarking.
+* Batch data manipulations (e.g. if you can't implement mass actions in Akeneo e.g. in Serenity edition).
+
+
+## Installation
+```
+composer require a-ast/akeneo-import
+
+```
+
+## Examples
 
 ### Create a simple product directly via API
  
 ```php
-
 $command = new UpdateOrCreateProduct('tshirt-red-xl');
 
 $importerFactory = new ImporterFactory();
@@ -54,3 +70,8 @@ $handler = $handlerFactory->createByCredentials('http://akeneo', 'client_id', 's
 $importer->import(new ArrayObject([$command]), $handler);
 
 ```  
+
+
+## See Also
+
+* [Command Query Separation](https://martinfowler.com/bliki/CommandQuerySeparation.html)
