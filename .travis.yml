@@ -9,7 +9,6 @@ php:
   - 7.1
 
 install:
-  - php ./fix_composer_json.php
   - composer self-update
   - composer install --prefer-source --no-interaction --dev
 
