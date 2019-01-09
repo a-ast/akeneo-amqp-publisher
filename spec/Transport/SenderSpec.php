@@ -31,7 +31,6 @@ class SenderSpec extends ObjectBehavior
 
         $serializer->serialize($commandBatch, 'json')->willReturn('serialized message');
 
-        $queue->addFlag(Argument::type('int'))->shouldBeCalled();
         $context->createProducer()->willReturn($producer);
         $context->createQueue(Argument::type('string'))->willReturn($queue);
 

@@ -30,9 +30,9 @@ class Sender
     {
         $producer = $this->context->createProducer();
         $queue = $this->context->createQueue($commandBatch->getCommandClass());
-        $queue->addFlag(AmqpQueue::FLAG_DURABLE);
 
-        if ($this->context instanceof AmqpContext) {
+        if ($queue instanceof AmqpQueue && $this->context instanceof AmqpContext) {
+            $queue->addFlag(AmqpQueue::FLAG_DURABLE);
             $this->context->declareQueue($queue);
         }
 

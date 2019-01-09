@@ -63,7 +63,8 @@ class ApiCommandHandler implements CommandHandlerInterface
             throw new CommandHandlerException('Number of commands must be greater than zero.', $commandClass);
         }
 
-        $data = $this->normalizer->normalize($commands->getItems());
+        $data = $this->normalizeCommandsToArray($commands);
+
         $api = $this->getApi($commandClass);
 
         $adapter = $this->findAdapter($api, $commandClass);
@@ -122,5 +123,16 @@ class ApiCommandHandler implements CommandHandlerInterface
         }
 
         throw new CommandHandlerException('API adapter not found', $commandClass);
+    }
+
+    private function normalizeCommandsToArray(CommandBatchInterface $commands): array
+    {
+        $data = $this->normalizer->normalize($commands->getItems());
+
+        if (!is_array($data)) {
+            throw new CommandHandlerException('Normalizer must return array', $commands->getCommandClass());
+        }
+
+        return $data;
     }
 }
