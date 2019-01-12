@@ -68,7 +68,7 @@ class ApiCommandHandler implements CommandHandlerInterface
 
         $api = $this->getApi($commandClass);
 
-        $adapter = $this->findAdapter($api, $commandClass);
+        $adapter = $this->findAdapter($commandClass);
         $response = $adapter->send($api, $data);
 
         try {
