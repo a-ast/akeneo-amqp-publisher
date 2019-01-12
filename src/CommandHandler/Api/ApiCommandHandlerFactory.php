@@ -2,6 +2,7 @@
 
 namespace Aa\AkeneoImport\CommandHandler\Api;
 
+use Aa\AkeneoImport\CommandHandler\Api\ApiAdapter\DeleteApiAdapter;
 use Aa\AkeneoImport\CommandHandler\Api\ApiAdapter\MediaApiAdapter;
 use Aa\AkeneoImport\CommandHandler\Api\ApiAdapter\UpsertableApiAdapter;
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\Validator;
@@ -23,8 +24,9 @@ class ApiCommandHandlerFactory
         $normalizer = $this->createSerializer();
 
         $apiAdapters = [
-            'upsertable' => new UpsertableApiAdapter(),
+            'upsertable' => new UpsertableApiAdapter($normalizer),
             'media' => new MediaApiAdapter(),
+            'delete' => new DeleteApiAdapter(),
         ];
 
         $validator = new Validator();

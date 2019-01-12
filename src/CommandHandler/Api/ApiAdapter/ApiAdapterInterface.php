@@ -2,11 +2,13 @@
 
 namespace Aa\AkeneoImport\CommandHandler\Api\ApiAdapter;
 
-use Traversable;
+use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\Response;
+use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
 
 interface ApiAdapterInterface
 {
-    public function send($api, array $data): Traversable;
-
-    public function supportsApi($api);
+    /**
+     * @return Response[]
+     */
+    public function send($api, CommandBatchInterface $commands): iterable;
 }

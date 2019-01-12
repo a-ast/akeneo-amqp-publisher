@@ -3,16 +3,30 @@
 namespace Aa\AkeneoImport\CommandHandler\Api\ApiAdapter;
 
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\Response;
+use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
+use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
 use Akeneo\Pim\ApiClient\Api\Operation\UpsertableResourceListInterface;
-use Traversable;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class UpsertableApiAdapter implements ApiAdapterInterface
 {
     /**
+     * @var NormalizerInterface
+     */
+    private $normalizer;
+
+    public function __construct(NormalizerInterface $normalizer)
+    {
+        $this->normalizer = $normalizer;
+    }
+
+    /**
      * @param UpsertableResourceListInterface $api
      */
-    public function send($api, array $data): Traversable
+    public function send($api, CommandBatchInterface $commands): iterable
     {
+        $data = $this->normalizeCommandsToArray($commands);
+
         $upsertedResources = $api->upsertList($data);
 
         $responses = [];
@@ -21,11 +35,17 @@ class UpsertableApiAdapter implements ApiAdapterInterface
             $responses[] = new Response($upsertedResource);
         }
 
-        return new \ArrayObject($responses);
+        return $responses;
     }
 
-    public function supportsApi($api)
+    private function normalizeCommandsToArray(CommandBatchInterface $commands): array
     {
-        return $api instanceof UpsertableResourceListInterface;
+        $data = $this->normalizer->normalize($commands->getItems());
+
+        if (!is_array($data)) {
+            throw new CommandHandlerException('Normalizer must return array', $commands->getCommandClass());
+        }
+
+        return $data;
     }
 }
