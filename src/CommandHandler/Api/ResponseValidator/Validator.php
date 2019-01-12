@@ -5,7 +5,6 @@ namespace Aa\AkeneoImport\CommandHandler\Api\ResponseValidator;
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\Exception\TolerantValidationException;
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\Exception\ValidationException;
 use Akeneo\Pim\ApiClient\Api\Operation\UpsertableResourceListInterface;
-use Traversable;
 
 class Validator implements ValidatorInterface
 {
@@ -13,9 +12,9 @@ class Validator implements ValidatorInterface
     const BAD_REQUEST = 400;
 
     /**
-     * @param \Traversable|Response[] $responses
+     * @param iterable|Response[] $responses
      */
-    public function validate(Traversable $responses)
+    public function validate(iterable $responses)
     {
         // Check tolerant cases first
         foreach ($responses as $response) {

@@ -4,6 +4,7 @@ namespace Aa\AkeneoImport\CommandHandler\Api;
 
 use Aa\AkeneoImport\CommandHandler\Api\ApiAdapter\ApiAdapterInterface;
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\Exception\TolerantValidationException;
+use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\Response;
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\ValidatorInterface;
 use Aa\AkeneoImport\ImportCommand\Category\UpdateOrCreateCategory;
 use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
@@ -71,13 +72,7 @@ class ApiCommandHandler implements CommandHandlerInterface
         $adapter = $this->findAdapter($commandClass);
         $response = $adapter->send($api, $data);
 
-        try {
-            $this->apiResponseValidator->validate($response);
-        } catch (TolerantValidationException $e) {
-            throw new RecoverableCommandHandlerException($e->getMessage(), $commandClass, $e);
-        } catch (Throwable $e) {
-            throw new CommandHandlerException($e->getMessage(), $commandClass, $e);
-        }
+        $this->validateResponse($response, $commandClass);
 
         // @todo
         // 5. Log messages with command list unique id
@@ -131,7 +126,6 @@ class ApiCommandHandler implements CommandHandlerInterface
                 return $this->apiAdapters['delete'];
 
             default:
-                // @todo: return null for non implemented commands, log and skip?
                 throw new CommandHandlerException(
                     sprintf(
                         'An API adapter for the class %s not found.',
@@ -150,5 +144,19 @@ class ApiCommandHandler implements CommandHandlerInterface
         }
 
         return $data;
+    }
+
+    /**
+     * @param iterable|Response[] $response
+     */
+    private function validateResponse(iterable $response, string $commandClass): void
+    {
+        try {
+            $this->apiResponseValidator->validate($response);
+        } catch (TolerantValidationException $e) {
+            throw new RecoverableCommandHandlerException($e->getMessage(), $commandClass, $e);
+        } catch (Throwable $e) {
+            throw new CommandHandlerException($e->getMessage(), $commandClass, $e);
+        }
     }
 }
