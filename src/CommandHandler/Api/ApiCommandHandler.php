@@ -12,6 +12,7 @@ use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
 use Aa\AkeneoImport\ImportCommand\Exception\RecoverableCommandHandlerException;
 use Aa\AkeneoImport\ImportCommand\Media\CreateProductMediaFile;
 use Aa\AkeneoImport\ImportCommand\Media\CreateProductModelMediaFile;
+use Aa\AkeneoImport\ImportCommand\Product\DeleteProduct;
 use Aa\AkeneoImport\ImportCommand\Product\UpdateOrCreateProduct;
 use Aa\AkeneoImport\ImportCommand\ProductModel\UpdateOrCreateProductModel;
 use Akeneo\Pim\ApiClient\AkeneoPimClientInterface;
@@ -87,7 +88,7 @@ class ApiCommandHandler implements CommandHandlerInterface
         return true;
     }
 
-    protected function getApi(string $commandClass)
+    private function getApi(string $commandClass)
     {
         switch ($commandClass) {
             case UpdateOrCreateProduct::class:
@@ -114,15 +115,30 @@ class ApiCommandHandler implements CommandHandlerInterface
         }
     }
 
-    private function findAdapter($api, string $commandClass): ApiAdapterInterface
+    private function findAdapter(string $commandClass): ApiAdapterInterface
     {
-        foreach ($this->apiAdapters as $adapter) {
-            if ($adapter->supportsApi($api)) {
-                return $adapter;
-            }
-        }
+        switch ($commandClass) {
+            case UpdateOrCreateProduct::class:
+            case UpdateOrCreateCategory::class:
+            case UpdateOrCreateProductModel::class:
+                return $this->apiAdapters['upsertable'];
 
-        throw new CommandHandlerException('API adapter not found', $commandClass);
+            case CreateProductMediaFile::class:
+            case CreateProductModelMediaFile::class:
+                return $this->apiAdapters['media'];
+
+            case DeleteProduct::class:
+                return $this->apiAdapters['delete'];
+
+            default:
+                // @todo: return null for non implemented commands, log and skip?
+                throw new CommandHandlerException(
+                    sprintf(
+                        'An API adapter for the class %s not found.',
+                        $commandClass
+                    ), $commandClass
+                );
+        }
     }
 
     private function normalizeCommandsToArray(CommandBatchInterface $commands): array

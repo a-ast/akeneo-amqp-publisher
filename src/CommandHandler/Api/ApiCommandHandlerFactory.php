@@ -23,8 +23,8 @@ class ApiCommandHandlerFactory
         $normalizer = $this->createSerializer();
 
         $apiAdapters = [
-            new UpsertableApiAdapter(),
-            new MediaApiAdapter(),
+            'upsertable' => new UpsertableApiAdapter(),
+            'media' => new MediaApiAdapter(),
         ];
 
         $validator = new Validator();
