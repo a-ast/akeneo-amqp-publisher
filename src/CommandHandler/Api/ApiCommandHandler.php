@@ -24,33 +24,26 @@ use Throwable;
 class ApiCommandHandler implements CommandHandlerInterface
 {
     /**
-     * @var AkeneoPimClientInterface
+     * @var ApiRegistry
      */
-    private $client;
+    private $apiRegistry;
 
     /**
-     * @var NormalizerInterface
+     * @var ApiAdapterRegistry
      */
-    private $normalizer;
-
-    /**
-     * @var ApiAdapterInterface[]
-     */
-    private $apiAdapters;
+    private $apiAdapterRegistry;
 
     /**
      * @var ValidatorInterface
      */
     private $apiResponseValidator;
 
-    public function __construct(AkeneoPimClientInterface $client,
-        NormalizerInterface $normalizer,
-        array $apiAdapters,
+    public function __construct(ApiRegistry $apiRegistry,
+        ApiAdapterRegistry $apiAdapterRegistry,
         ValidatorInterface $apiResponseValidator
     ) {
-        $this->client = $client;
-        $this->normalizer = $normalizer;
-        $this->apiAdapters = $apiAdapters;
+        $this->apiRegistry = $apiRegistry;
+        $this->apiAdapterRegistry = $apiAdapterRegistry;
         $this->apiResponseValidator = $apiResponseValidator;
     }
 
@@ -59,15 +52,13 @@ class ApiCommandHandler implements CommandHandlerInterface
      */
     public function handle(CommandBatchInterface $commands)
     {
+        $this->validateCommands($commands);
+
         $commandClass = $commands->getCommandClass();
 
-        if (0 === count($commands)) {
-            throw new CommandHandlerException('Number of commands must be greater than zero.', $commandClass);
-        }
+        $api = $this->apiRegistry->getApi($commandClass);
+        $adapter = $this->apiAdapterRegistry->getApiAdapter($commandClass);
 
-        $api = $this->getApi($commandClass);
-
-        $adapter = $this->findAdapter($commandClass);
         $response = $adapter->send($api, $commands);
 
         $this->validateResponse($response, $commandClass);
@@ -81,55 +72,12 @@ class ApiCommandHandler implements CommandHandlerInterface
         return true;
     }
 
-    private function getApi(string $commandClass)
+    private function validateCommands(CommandBatchInterface $commands)
     {
-        switch ($commandClass) {
-            case UpdateOrCreateProduct::class:
-                return $this->client->getProductApi();
-
-            case UpdateOrCreateProductModel::class:
-                return $this->client->getProductModelApi();
-
-            case UpdateOrCreateCategory::class:
-                return $this->client->getCategoryApi();
-
-            case CreateProductMediaFile::class:
-            case CreateProductModelMediaFile::class:
-                return $this->client->getProductMediaFileApi();
-
-            default:
-                // @todo: return null for non implemented commands, log and skip?
-                throw new CommandHandlerException(
-                    sprintf(
-                        'An Akeneo API for the class %s not found.',
-                        $commandClass
-                    ), $commandClass
-                );
-        }
-    }
-
-    private function findAdapter(string $commandClass): ApiAdapterInterface
-    {
-        switch ($commandClass) {
-            case UpdateOrCreateProduct::class:
-            case UpdateOrCreateCategory::class:
-            case UpdateOrCreateProductModel::class:
-                return $this->apiAdapters['upsertable'];
-
-            case CreateProductMediaFile::class:
-            case CreateProductModelMediaFile::class:
-                return $this->apiAdapters['media'];
-
-            case DeleteProduct::class:
-                return $this->apiAdapters['delete'];
-
-            default:
-                throw new CommandHandlerException(
-                    sprintf(
-                        'An API adapter for the class %s not found.',
-                        $commandClass
-                    ), $commandClass
-                );
+        if (0 === count($commands)) {
+            throw new CommandHandlerException(
+                'Number of commands must be greater than zero.', $commands->getCommandClass()
+            );
         }
     }
 

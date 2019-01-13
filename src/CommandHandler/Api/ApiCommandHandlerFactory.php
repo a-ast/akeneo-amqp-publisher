@@ -23,15 +23,17 @@ class ApiCommandHandlerFactory
     {
         $normalizer = $this->createSerializer();
 
-        $apiAdapters = [
-            'upsertable' => new UpsertableApiAdapter($normalizer),
+        $apiRegistry = new ApiRegistry($client);
+
+        $apiAdapterRegistry = new ApiAdapterRegistry([
+            'upsert' => new UpsertableApiAdapter($normalizer),
             'media' => new MediaApiAdapter(),
             'delete' => new DeleteApiAdapter(),
-        ];
+        ]);
 
         $validator = new Validator();
 
-        return new ApiCommandHandler($client, $normalizer, $apiAdapters, $validator);
+        return new ApiCommandHandler($apiRegistry, $apiAdapterRegistry  , $validator);
     }
 
     public function createByCredentials(string $baseUri, string $clientId, string $secret, string $username, string $password): ApiCommandHandler
