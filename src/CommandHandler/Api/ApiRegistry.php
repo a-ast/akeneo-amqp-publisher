@@ -7,6 +7,7 @@ use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
 use Aa\AkeneoImport\ImportCommand\Media\CreateProductMediaFile;
 use Aa\AkeneoImport\ImportCommand\Media\CreateProductModelMediaFile;
 use Aa\AkeneoImport\ImportCommand\Product\UpdateOrCreateProduct;
+use Aa\AkeneoImport\ImportCommand\Product\DeleteProduct;
 use Aa\AkeneoImport\ImportCommand\ProductModel\UpdateOrCreateProductModel;
 use Akeneo\Pim\ApiClient\AkeneoPimClientInterface;
 
@@ -27,6 +28,7 @@ class ApiRegistry
     {
         switch ($commandClass) {
             case UpdateOrCreateProduct::class:
+            case DeleteProduct::class:
                 return $this->client->getProductApi();
 
             case UpdateOrCreateProductModel::class:
