@@ -2,22 +2,13 @@
 
 namespace Aa\AkeneoImport\CommandHandler\Api;
 
-use Aa\AkeneoImport\CommandHandler\Api\ApiAdapter\ApiAdapterInterface;
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\Exception\TolerantValidationException;
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\Response;
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\ValidatorInterface;
-use Aa\AkeneoImport\ImportCommand\Category\UpdateOrCreateCategory;
 use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
 use Aa\AkeneoImport\ImportCommand\Exception\RecoverableCommandHandlerException;
-use Aa\AkeneoImport\ImportCommand\Media\CreateProductMediaFile;
-use Aa\AkeneoImport\ImportCommand\Media\CreateProductModelMediaFile;
-use Aa\AkeneoImport\ImportCommand\Product\DeleteProduct;
-use Aa\AkeneoImport\ImportCommand\Product\UpdateOrCreateProduct;
-use Aa\AkeneoImport\ImportCommand\ProductModel\UpdateOrCreateProductModel;
-use Akeneo\Pim\ApiClient\AkeneoPimClientInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Throwable;
 
 
