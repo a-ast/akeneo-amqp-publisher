@@ -34,7 +34,7 @@ class DeleteApiAdapter implements ApiAdapterInterface
             }
         }
 
-        return new $errors;
+        return $errors;
     }
 
     private function getEntityUniqueCode(CommandInterface $command)
