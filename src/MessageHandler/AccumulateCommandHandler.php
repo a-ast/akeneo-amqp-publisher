@@ -55,16 +55,19 @@ class AccumulateCommandHandler implements MessageHandlerInterface
 
         $this->addCommand($command);
 
-        if ($command instanceof CommandsAwareInterface) {
-            foreach ($command->getExtraCommands() as $extraCommand) {
-                $this->addCommand($extraCommand);
-            }
-        }
+//        if ($command instanceof CommandsAwareInterface) {
+//            foreach ($command->getExtraCommands() as $extraCommand) {
+//                $this->addCommand($extraCommand);
+//            }
+//        }
     }
 
     private function addCommand(CommandInterface $command)
     {
-        $commandClass = get_class($command);
+        $commandClass = $command->getType();
+
+        // @todo: cacuclate unique codes and dispatch in maximum reached
+
         $this->commandAccumulator[$commandClass][] = $command;
 
         $this->dispatchIfLimitReached();

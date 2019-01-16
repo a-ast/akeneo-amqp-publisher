@@ -2,6 +2,7 @@
 
 namespace Aa\AkeneoImport\CommandHandler\Api;
 
+use Aa\AkeneoImport\ImportCommand\CommandTypes;
 use Aa\AkeneoImport\ImportCommand\Category\UpdateOrCreateCategory;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
 use Aa\AkeneoImport\ImportCommand\Media\CreateProductMediaFile;
@@ -27,6 +28,7 @@ class ApiRegistry
     public function getApi(string $commandClass)
     {
         switch ($commandClass) {
+            case CommandTypes::PRODUCT:
             case UpdateOrCreateProduct::class:
             case DeleteProduct::class:
                 return $this->client->getProductApi();

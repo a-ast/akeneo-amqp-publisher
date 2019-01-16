@@ -2,6 +2,7 @@
 
 namespace Aa\AkeneoImport\CommandHandler\Api;
 
+use Aa\AkeneoImport\ImportCommand\CommandTypes;
 use Aa\AkeneoImport\CommandHandler\Api\ApiAdapter\ApiAdapterInterface;
 use Aa\AkeneoImport\ImportCommand\Category\UpdateOrCreateCategory;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
@@ -26,6 +27,7 @@ class ApiAdapterRegistry
     public function getApiAdapter(string $commandClass): ApiAdapterInterface
     {
         switch ($commandClass) {
+            case CommandTypes::PRODUCT:
             case UpdateOrCreateProduct::class:
             case UpdateOrCreateCategory::class:
             case UpdateOrCreateProductModel::class:

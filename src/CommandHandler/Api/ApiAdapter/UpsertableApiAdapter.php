@@ -25,8 +25,22 @@ class UpsertableApiAdapter implements ApiAdapterInterface
      */
     public function send($api, CommandBatchInterface $commands): iterable
     {
-        $data = $this->normalizeCommandsToArray($commands);
+        //$data = $this->normalizeCommandsToArray($commands);
 
+        $data = [];
+
+        foreach ($commands->getItems() as $command) {
+
+            // @todo: ignore `type` using AbstractNormalizer::IGNORED_ATTRIBUTES
+            $commandData = $this->normalizer->normalize($command);
+            unset($commandData['type']);
+
+            $entityCode = $commandData['productIdentifier'];
+
+            $data[$entityCode] = array_merge($data[$entityCode] ?? [], $commandData);
+        }
+
+        // @todo: chunk for 100 lines
         $upsertedResources = $api->upsertList($data);
 
         $responses = [];

@@ -47,8 +47,8 @@ class ApiCommandHandlerFactory
     private function createSerializer(): NormalizerInterface
     {
         $normalizers = [
-            new CommandBatchNormalizer(),
-            new CommandNormalizer(),
+//            new CommandBatchNormalizer(),
+//            new CommandNormalizer(),
             new DateTimeNormalizer(),
             new DateIntervalNormalizer(),
             new ArrayDenormalizer(),
