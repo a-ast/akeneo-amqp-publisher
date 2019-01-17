@@ -17,56 +17,57 @@ class UpsertableHandler implements CommandHandlerInterface
     private $api;
 
     /**
-     * @var \Symfony\Component\Serializer\Normalizer\NormalizerInterface
+     * @var NormalizerInterface
      */
     private $normalizer;
 
-    /**
-     * @var array
-     */
-    private $accumulatedCommands = [];
 
     /**
-     * @var int
+     * @var CommandAccumulator
      */
-    private $batchSize;
+    private $accumulator;
 
     public function __construct(UpsertableResourceListInterface $api, NormalizerInterface $normalizer, int $batchSize = 100)
     {
         $this->api = $api;
         $this->normalizer = $normalizer;
-        $this->batchSize = $batchSize;
+        $this->accumulator = new CommandAccumulator($batchSize);
     }
 
     public function handle(CommandInterface $command)
     {
         if ($command instanceof FinishImport) {
-            $this->sendAll();
+            $this->sendCommands($this->accumulator->getCommands());
 
             return;
         }
 
-        if (count($this->accumulatedCommands) === $this->batchSize) {
+        $commandCode = $command->getProductIdentifier();
 
-            $this->sendAll();
-
-            $this->accumulatedCommands = [$command];
-
-            return;
+        if ($this->accumulator->isFullAfter($commandCode)) {
+            $this->sendCommands($this->accumulator->getCommands());
         }
 
-        $this->accumulatedCommands[] = $command;
+        $this->accumulator->add($commandCode, $command);
     }
 
-    private function sendAll()
+    private function sendCommands(iterable $commands)
     {
-        $commandData = $this->normalizer->normalize($this->accumulatedCommands);
+        if (0 === count($commands)) {
+            return;
+        }
+
+        $commandData = $this->normalizer->normalize($commands);
 
         if (!is_array($commandData)) {
             throw new CommandHandlerException('Normalizer must return an array');
         }
 
         $upsertedResources = $this->api->upsertList($commandData);
+
+        // @todo: checks 4XX and that it doesn't clear batches
+
+        $this->accumulator->clear();
 
         foreach ($upsertedResources as $upsertedResource) {
             if (422 === $upsertedResource['status_code']) {
