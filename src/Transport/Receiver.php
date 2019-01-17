@@ -36,6 +36,9 @@ class Receiver
             $message = $consumer->receive(1);
 
             if (null === $message) {
+
+                // @todo: or maybe here
+                // try to yield finish command and check again?
                 $isConsuming = false;
 
                 continue;
@@ -50,6 +53,8 @@ class Receiver
                 $consumer->acknowledge($message);
 
             } catch (RecoverableCommandHandlerException $e) {
+
+                // @todo: publish failed messages again with finish import flag?
 
                 // true for requeue
                 $consumer->reject($message, true);

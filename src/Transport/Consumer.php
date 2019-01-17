@@ -24,9 +24,14 @@ class Consumer
 
             try {
                 $handler->handle($commandBatch);
+
+                // @todo: if recoverable exception with the list of failed commands, then send it again to the queue (to the end)?
+
             } catch (\Exception $e) {
                 $receive->throw($e);
             }
         }
+
+        // send finish to all handlers?
     }
 }

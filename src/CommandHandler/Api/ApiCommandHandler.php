@@ -58,19 +58,6 @@ class ApiCommandHandler implements CommandHandlerInterface
         // 5. Log messages with command list unique id
     }
 
-    public function shouldKeepCommandOrder(): bool
-    {
-        return true;
-    }
-
-    private function validateCommands(CommandBatchInterface $commands)
-    {
-        if (0 === count($commands)) {
-            throw new CommandHandlerException(
-                'Number of commands must be greater than zero.', $commands->getCommandClass()
-            );
-        }
-    }
 
     /**
      * @param iterable|Response[] $response

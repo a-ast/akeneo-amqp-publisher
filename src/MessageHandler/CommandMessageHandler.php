@@ -3,10 +3,10 @@
 namespace Aa\AkeneoImport\MessageHandler;
 
 use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
-use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
+use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class CommandBatchMessageHandler implements MessageHandlerInterface
+class CommandMessageHandler implements MessageHandlerInterface
 {
     /**
      * @var CommandHandlerInterface
@@ -18,8 +18,8 @@ class CommandBatchMessageHandler implements MessageHandlerInterface
         $this->handler = $handler;
     }
 
-    public function __invoke(CommandBatchInterface $commands)
+    public function __invoke(CommandInterface $command)
     {
-        $this->handler->handle($commands);
+        $this->handler->handle($command);
     }
 }

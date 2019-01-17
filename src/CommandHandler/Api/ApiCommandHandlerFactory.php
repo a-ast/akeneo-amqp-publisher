@@ -5,7 +5,9 @@ namespace Aa\AkeneoImport\CommandHandler\Api;
 use Aa\AkeneoImport\CommandHandler\Api\ApiAdapter\DeleteApiAdapter;
 use Aa\AkeneoImport\CommandHandler\Api\ApiAdapter\MediaApiAdapter;
 use Aa\AkeneoImport\CommandHandler\Api\ApiAdapter\UpsertableApiAdapter;
+use Aa\AkeneoImport\CommandHandler\Api\Handler\DeleteHandler;
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\Validator;
+use Aa\AkeneoImport\ImportCommand\Product\DeleteProduct;
 use Aa\AkeneoImport\Normalizer\CommandBatchNormalizer;
 use Aa\AkeneoImport\Normalizer\CommandNormalizer;
 use Akeneo\Pim\ApiClient\AkeneoPimClientBuilder;
@@ -19,21 +21,26 @@ use Symfony\Component\Serializer\Serializer;
 
 class ApiCommandHandlerFactory
 {
-    public function createByApiClient(AkeneoPimClientInterface $client): ApiCommandHandler
+    public function createByApiClient(AkeneoPimClientInterface $client): array
     {
         $normalizer = $this->createSerializer();
 
-        $apiRegistry = new ApiRegistry($client);
+        return [
+            DeleteProduct::class => new DeleteHandler($client->getProductApi()),
+        ];
 
-        $apiAdapterRegistry = new ApiAdapterRegistry([
-            'upsert' => new UpsertableApiAdapter($normalizer),
-            'media' => new MediaApiAdapter(),
-            'delete' => new DeleteApiAdapter(),
-        ]);
 
-        $validator = new Validator();
+//        $apiRegistry = new ApiRegistry($client);
+//
+//        $apiAdapterRegistry = new ApiAdapterRegistry([
+//            'upsert' => new UpsertableApiAdapter($normalizer),
+//            'media' => new MediaApiAdapter(),
+//            'delete' => new DeleteApiAdapter(),
+//        ]);
 
-        return new ApiCommandHandler($apiRegistry, $apiAdapterRegistry  , $validator);
+//        $validator = new Validator();
+
+//        return new ApiCommandHandler($apiRegistry, $apiAdapterRegistry  , $validator);
     }
 
     public function createByCredentials(string $baseUri, string $clientId, string $secret, string $username, string $password): ApiCommandHandler

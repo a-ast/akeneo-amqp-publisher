@@ -35,7 +35,7 @@ $importer = (new ImporterFactory())->create();
 $handler = (new ApiCommandHandlerFactory())
                 ->createByCredentials('http://akeneo', 'client_id', 'secret', 'user', 'pass');
 
-$importer->import(new ArrayObject([$command]), $handler);
+$importer->import([$command], $handler);
 
 ``` 
 
@@ -48,7 +48,7 @@ $command = new UpdateOrCreateProduct('tshirt-red-xl');
 $importer = (new ImporterFactory())->create();
 $handler = (new AmqpCommandHandlerFactory())->createByDsn('dsn://mq');
 
-$importer->import(new ArrayObject([$command]), $handler);
+$importer->import([$command], $handler);
 
 ``` 
 
@@ -61,7 +61,7 @@ $handlerFactory = new ApiCommandHandlerFactory();
 $handler = (new ApiCommandHandlerFactory())
                  ->createByCredentials('http://akeneo', 'client_id', 'secret', 'user', 'pass');
 
-$importer->import(new ArrayObject([$command]), $handler);
+$consumer->consume($handler, $queueName);
 
 ```  
 

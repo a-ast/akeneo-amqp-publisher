@@ -4,9 +4,9 @@ namespace Aa\AkeneoImport\CommandBus;
 
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
-use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
+use Aa\AkeneoImport\ImportCommand\Product\DeleteProduct;
 use Aa\AkeneoImport\MessageHandler\AccumulateCommandHandler;
-use Aa\AkeneoImport\MessageHandler\CommandBatchMessageHandler;
+use Aa\AkeneoImport\MessageHandler\CommandMessageHandler;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -16,11 +16,13 @@ class CommandBusFactory
 {
     public function createCommandBus(CommandHandlerInterface $handler): MessageBusInterface
     {
-        $commandBatchHandler = new CommandBatchMessageHandler($handler);
-        $commandHandler = new AccumulateCommandHandler( 100, $handler->shouldKeepCommandOrder());
+//        $commandHandler = new AccumulateCommandHandler( 100, $handler->shouldKeepCommandOrder());
+
+
+
 
         $handlersLocator = new HandlersLocator([
-            CommandBatchInterface::class => [ CommandBatchInterface::class => $commandBatchHandler],
+            DeleteProduct::class => [ DeleteProduct::class => $deleteHandler],
             CommandInterface::class => [ CommandInterface::class => $commandHandler],
         ]);
 
