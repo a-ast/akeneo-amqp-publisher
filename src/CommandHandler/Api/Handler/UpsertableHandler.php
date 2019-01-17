@@ -24,10 +24,21 @@ class UpsertableHandler implements CommandHandlerInterface
      */
     private $normalizer;
 
-    public function __construct(UpsertableResourceListInterface $api, NormalizerInterface $normalizer)
+    /**
+     * @var array
+     */
+    private $accumulatedCommands = [];
+
+    /**
+     * @var int
+     */
+    private $batchSize;
+
+    public function __construct(UpsertableResourceListInterface $api, NormalizerInterface $normalizer, int $batchSize = 100)
     {
         $this->api = $api;
         $this->normalizer = $normalizer;
+        $this->batchSize = $batchSize;
     }
 
     public function handle(CommandInterface $command)
@@ -38,22 +49,29 @@ class UpsertableHandler implements CommandHandlerInterface
             return;
         }
 
-        // @todo: ignore `type` using AbstractNormalizer::IGNORED_ATTRIBUTES
-        $commandData = $this->normalizer->normalize($command);
-        unset($commandData['type']);
+        if (count($this->accumulatedCommands) === $this->batchSize) {
 
-        $entityCode = $commandData['productIdentifier'];
+            $this->sendAll();
 
-//        $data[$entityCode] = array_merge($data[$entityCode] ?? [], $commandData);
+            $this->accumulatedCommands = [$command];
 
-        // @todo: chunk for 100 lines
-        // $upsertedResources = $this->api->upsertList([$commandData]);
+            return;
+        }
 
+        $this->accumulatedCommands[] = $command;
     }
 
 
     private function sendAll()
     {
-        // @todo:
+        $commandData = $this->normalizer->normalize($this->accumulatedCommands);
+
+        $upsertedResources = $this->api->upsertList($commandData);
+
+        foreach ($upsertedResources as $upsertedResource) {
+            if (422 === $upsertedResource['status_code']) {
+                throw new CommandHandlerException($upsertedResource['message'], '');
+            }
+        }
     }
 }
