@@ -2,8 +2,8 @@
 
 namespace spec\Aa\AkeneoImport\Transport;
 
+use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\Transport\Receiver;
-use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
 use Interop\Queue\Consumer;
 use Interop\Queue\Context;
 use Interop\Queue\Queue;
@@ -23,13 +23,12 @@ class ReceiverSpec extends ObjectBehavior
         $this->shouldHaveType(Receiver::class);
     }
 
-    function it_receives_command_batch(CommandBatchInterface $commandBatch, Context $context,
+    function it_receives_command_batch(CommandInterface $command, Context $context,
         SerializerInterface $serializer, Consumer $consumer, Queue $queue
     ) {
         $queueName = 'Aa\\Commands\\Command';
-        $commandBatch->getCommandClass()->willReturn($queueName);
 
-        $serializer->deserialize(Argument::any(), $queueName, 'json')->willReturn($commandBatch);
+        $serializer->deserialize(Argument::any(), $queueName, 'json')->willReturn([$command]);
 
         $context->createQueue(Argument::type('string'))->willReturn($queue);
         $context->createConsumer($queue)->willReturn($consumer);

@@ -2,8 +2,8 @@
 
 namespace spec\Aa\AkeneoImport\Transport;
 
+use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\Transport\Sender;
-use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
 use Interop\Amqp\AmqpQueue;
 use Interop\Queue\Context;
 use Interop\Queue\Message;
@@ -24,18 +24,16 @@ class SenderSpec extends ObjectBehavior
         $this->shouldHaveType(Sender::class);
     }
 
-    function it_sends_command_batch(CommandBatchInterface $commandBatch, Context $context,
+    function it_sends_command_batch(CommandInterface $command, Context $context,
         SerializerInterface $serializer, Producer $producer, AmqpQueue $queue, Message $message
     ) {
-        $commandBatch->getCommandClass()->willReturn('Aa\\Commands\\Command');
-
-        $serializer->serialize($commandBatch, 'json')->willReturn('serialized message');
+        $serializer->serialize($command, 'json')->willReturn('serialized message');
 
         $context->createProducer()->willReturn($producer);
         $context->createQueue(Argument::type('string'))->willReturn($queue);
 
         $context->createMessage(Argument::type('string'))->willReturn($message);
 
-        $this->send($commandBatch);
+        $this->send($command);
     }
 }

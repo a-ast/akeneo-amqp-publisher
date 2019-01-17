@@ -16,7 +16,7 @@ class ImporterSpec extends ObjectBehavior
         CommandHandlerInterface $handler,
         MessageBusInterface $bus
     ) {
-        $factory->createCommandBus($handler)->willReturn($bus);
+        $factory->createCommandBus([$handler])->willReturn($bus);
         $bus->dispatch(Argument::any())->willReturn(new Envelope(new class {}));
 
         $this->beConstructedWith($factory);
@@ -29,7 +29,7 @@ class ImporterSpec extends ObjectBehavior
 
     function it_imports_array_of_command(CommandHandlerInterface $handler)
     {
-        $this->import([], $handler);
+        $this->import([], [$handler]);
     }
 
     function it_imports_commands_provided_by_generator(CommandHandlerInterface $handler)
@@ -42,6 +42,6 @@ class ImporterSpec extends ObjectBehavior
             }
         };
 
-        $this->import($generator->getCommands(), $handler);
+        $this->import($generator->getCommands(), [$handler]);
     }
 }

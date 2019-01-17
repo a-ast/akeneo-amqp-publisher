@@ -6,16 +6,13 @@ use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Control\FinishImport;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
-use Aa\AkeneoImport\ImportCommand\Media\CreateProductMediaFile;
-use Aa\AkeneoImport\ImportCommand\Media\CreateProductModelMediaFile;
-use Akeneo\Pim\ApiClient\Api\MediaFileApiInterface;
 use Akeneo\Pim\ApiClient\Api\Operation\UpsertableResourceListInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class UpsertableHandler implements CommandHandlerInterface
 {
     /**
-     * @var MediaFileApiInterface
+     * @var UpsertableResourceListInterface
      */
     private $api;
 
@@ -61,16 +58,19 @@ class UpsertableHandler implements CommandHandlerInterface
         $this->accumulatedCommands[] = $command;
     }
 
-
     private function sendAll()
     {
         $commandData = $this->normalizer->normalize($this->accumulatedCommands);
+
+        if (!is_array($commandData)) {
+            throw new CommandHandlerException('Normalizer must return an array');
+        }
 
         $upsertedResources = $this->api->upsertList($commandData);
 
         foreach ($upsertedResources as $upsertedResource) {
             if (422 === $upsertedResource['status_code']) {
-                throw new CommandHandlerException($upsertedResource['message'], '');
+                throw new CommandHandlerException($upsertedResource['message']);
             }
         }
     }

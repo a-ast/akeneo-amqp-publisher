@@ -23,6 +23,10 @@ class MediaHandler implements CommandHandlerInterface
 
     public function handle(CommandInterface $command)
     {
+        if (!$command instanceof CreateProductMediaFile && !$command instanceof CreateProductModelMediaFile) {
+            return;
+        }
+
         $meta = $this->getCommandMetadata($command);
         $this->api->create($command->getFileName(), $meta);
     }
@@ -49,6 +53,6 @@ class MediaHandler implements CommandHandlerInterface
             ];
         }
 
-        throw new CommandHandlerException('Unsupported class of the create media command.', get_class($command));
+        throw new CommandHandlerException('Unsupported class of the create media command.');
     }
 }

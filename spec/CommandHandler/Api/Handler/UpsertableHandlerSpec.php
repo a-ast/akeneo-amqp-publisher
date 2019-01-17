@@ -51,6 +51,8 @@ class UpsertableHandlerSpec extends ObjectBehavior
 
     function it_throws_an_exception_if_api_cant_upsert_data(UpsertableResourceListInterface $api, NormalizerInterface $normalizer, CommandInterface $command)
     {
+        $normalizer->normalize(Argument::type('array'))->willReturn([]);
+
         $api->upsertList(Argument::any())->willReturn([
            ['status_code' => 201, 'message' => 'Ok', 'identifier' => 1],
            ['status_code' => 422, 'message' => 'Wrong command', 'identifier' => 2],
@@ -59,6 +61,6 @@ class UpsertableHandlerSpec extends ObjectBehavior
         ]);
 
         $this->handle($command);
-        $this->shouldThrow(new CommandHandlerException('Wrong command', ''))->during('handle', [new FinishImport()]);
+        $this->shouldThrow(new CommandHandlerException('Wrong command'))->during('handle', [new FinishImport()]);
     }
 }

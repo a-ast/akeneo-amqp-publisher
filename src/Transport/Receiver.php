@@ -45,7 +45,8 @@ class Receiver
             }
 
             $body = $message->getBody();
-            $commandBatch = $this->serializer->deserialize($body, CommandBatch::class, 'json');
+            // @todo: take class from header
+            $commandBatch = $this->serializer->deserialize($body, '', 'json');
 
             try {
                 yield $commandBatch;

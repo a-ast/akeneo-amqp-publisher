@@ -2,7 +2,7 @@
 
 namespace Aa\AkeneoImport\Transport;
 
-use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
+use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Enqueue\AmqpExt\AmqpContext;
 use Interop\Amqp\Impl\AmqpQueue;
 use Interop\Queue\Context;
@@ -26,17 +26,17 @@ class Sender
         $this->serializer = $serializer;
     }
 
-    public function send(CommandBatchInterface $commandBatch)
+    public function send(CommandInterface $command)
     {
         $producer = $this->context->createProducer();
-        $queue = $this->context->createQueue($commandBatch->getCommandClass());
+        $queue = $this->context->createQueue('messages');
 
         if ($queue instanceof AmqpQueue && $this->context instanceof AmqpContext) {
             $queue->addFlag(AmqpQueue::FLAG_DURABLE);
             $this->context->declareQueue($queue);
         }
 
-        $body = $this->serializer->serialize($commandBatch, 'json');
+        $body = $this->serializer->serialize($command, 'json');
 
         $message = $this->context->createMessage($body);
 
