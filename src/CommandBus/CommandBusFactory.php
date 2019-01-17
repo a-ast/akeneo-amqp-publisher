@@ -14,23 +14,23 @@ use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 
 class CommandBusFactory
 {
-    public function createCommandBus(CommandHandlerInterface $handler): MessageBusInterface
+
+    /**
+     * @param CommandHandlerInterface[] $handlers
+     */
+    public function createCommandBus(iterable $handlers): MessageBusInterface
     {
-//        $commandHandler = new AccumulateCommandHandler( 100, $handler->shouldKeepCommandOrder());
+        $messageHandlers = [];
 
+        foreach ($handlers as $class => $handler) {
+            $messageHandlers[$class] = [$class => new CommandMessageHandler($handler)];
+        }
 
-
-
-        $handlersLocator = new HandlersLocator([
-            DeleteProduct::class => [ DeleteProduct::class => $deleteHandler],
-            CommandInterface::class => [ CommandInterface::class => $commandHandler],
-        ]);
+        $handlersLocator = new HandlersLocator($messageHandlers);
 
         $middlewares[] = new HandleMessageMiddleware($handlersLocator);
 
         $commandBus = new MessageBus($middlewares);
-
-        $commandHandler->setMessageBus($commandBus);
 
         return $commandBus;
     }

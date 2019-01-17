@@ -19,11 +19,11 @@ class Importer
         $this->commandBusFactory = $commandBusFactory;
     }
 
-    public function import(iterable $commands, CommandHandlerInterface $handler)
+    public function import(iterable $commands, array $handlers)
     {
         // @todo: generate import id and send with envelope
 
-        $bus = $this->commandBusFactory->createCommandBus($handler);
+        $bus = $this->commandBusFactory->createCommandBus($handlers);
 
         foreach ($commands as $command) {
             $bus->dispatch($command);

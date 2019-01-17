@@ -6,7 +6,7 @@ use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\Exception\TolerantValid
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\Response;
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\ValidatorInterface;
 use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
-use Aa\AkeneoImport\ImportCommand\CommandBatchInterface;
+use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
 use Aa\AkeneoImport\ImportCommand\Exception\RecoverableCommandHandlerException;
 use Throwable;
@@ -41,8 +41,10 @@ class ApiCommandHandler implements CommandHandlerInterface
     /**
      * @throws CommandHandlerException
      */
-    public function handle(CommandBatchInterface $commands)
+    public function handle(CommandInterface $command)
     {
+        return;
+
         $this->validateCommands($commands);
 
         $commandClass = $commands->getCommandClass();

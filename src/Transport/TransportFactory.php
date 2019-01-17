@@ -54,8 +54,8 @@ class TransportFactory
     private function createSerializer(): SerializerInterface
     {
         $normalizers = [
-            new CommandBatchNormalizer(),
-            new CommandNormalizer(),
+//            new CommandBatchNormalizer(),
+//            new CommandNormalizer(),
             new JsonSerializableNormalizer(),
             new DateTimeNormalizer(),
             new DateIntervalNormalizer(),
