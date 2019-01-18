@@ -80,7 +80,7 @@ class UpsertableHandler implements CommandHandlerInterface
     private function getEntityUniqueCode(CommandInterface $command)
     {
         if ($command instanceof ProductFieldInterface) {
-            return $command->getIdentifier();
+            return $command->getProductIdentifier();
         }
 
         return $command->getProductModelCode();
