@@ -26,18 +26,24 @@ class ApiCommandHandlerFactory
     {
         $normalizer = $this->createSerializer();
 
-        $upsertableHandler = new UpsertableHandler(
+        $upsertableProductHandler = new UpsertableHandler(
             $client->getProductApi(),
             $normalizer
         );
+
+        $upsertableProductModelHandler = new UpsertableHandler(
+            $client->getProductModelApi(),
+            $normalizer
+        );
+
 
         return [
             DeleteProduct::class => new DeleteHandler($client->getProductApi()),
             CreateProductMediaFile::class => new MediaHandler($client->getProductMediaFileApi()),
             CreateProductModelMediaFile::class => new MediaHandler($client->getProductMediaFileApi()),
-            ProductFieldInterface::class => $upsertableHandler,
-            ProductModelFieldInterface::class => new UpsertableHandler($client->getProductModelApi(), $normalizer),
-            FinishImport::class => $upsertableHandler,
+            ProductFieldInterface::class => $upsertableProductHandler,
+            ProductModelFieldInterface::class => $upsertableProductModelHandler,
+            FinishImport::class => $upsertableProductModelHandler,
         ];
     }
 

@@ -6,6 +6,7 @@ use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Control\FinishImport;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
+use Aa\AkeneoImport\ImportCommand\Product\ProductFieldInterface;
 use Akeneo\Pim\ApiClient\Api\Operation\UpsertableResourceListInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -42,7 +43,7 @@ class UpsertableHandler implements CommandHandlerInterface
             return;
         }
 
-        $commandCode = $command->getProductIdentifier();
+        $commandCode = $this->getEntityUniqueCode($command);
 
         if ($this->accumulator->isFullAfter($commandCode)) {
             $this->sendCommands($this->accumulator->getCommands());
@@ -74,5 +75,14 @@ class UpsertableHandler implements CommandHandlerInterface
                 throw new CommandHandlerException($upsertedResource['message']);
             }
         }
+    }
+
+    private function getEntityUniqueCode(CommandInterface $command)
+    {
+        if ($command instanceof ProductFieldInterface) {
+            return $command->getIdentifier();
+        }
+
+        return $command->getProductModelCode();
     }
 }
