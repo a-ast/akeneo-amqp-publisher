@@ -54,14 +54,14 @@ class UpsertableHandler implements CommandHandlerInterface
 
     private function sendCommands(iterable $commands)
     {
-        if (0 === count($commands)) {
-            return;
-        }
-
         $commandData = $this->normalizer->normalize($commands);
 
         if (!is_array($commandData)) {
             throw new CommandHandlerException('Normalizer must return an array');
+        }
+
+        if (0 === count($commandData)) {
+            return;
         }
 
         $upsertedResources = $this->api->upsertList($commandData);
