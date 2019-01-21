@@ -7,12 +7,22 @@ use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use spec\Aa\AkeneoImport\CommandHandler\Api\Handler\fixture\TestCommand;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class CommandAccumulatorSpec extends ObjectBehavior
 {
-    function let()
+    function let(NormalizerInterface $normalizer)
     {
-        $this->beConstructedWith(3);
+        $normalizer
+            ->normalize(Argument::type(TestCommand::class), Argument::any(), Argument::any())
+            ->will(function(array $commands) {
+                $command = $commands[0];
+
+                return array_merge(['identifier' => $command->getProductIdentifier()], $command->getAttributes());
+            })
+        ;
+
+        $this->beConstructedWith($normalizer, 'identifier');
     }
 
     function it_is_initializable()
@@ -22,46 +32,54 @@ class CommandAccumulatorSpec extends ObjectBehavior
 
     function it_adds_a_command()
     {
-        $this->add('1', new TestCommand('1'));
+        $command = new TestCommand('1');
+
+        $this->add($command);
     }
 
-    function it_is_not_full_after_adding_an_existing_id()
+    function it_returns_count_after_adding_a_command_with_existing_code()
     {
-        $this->add('1', new TestCommand('1'));
-        $this->add('2', new TestCommand('2'));
-        $this->add('3', new TestCommand('3'));
+        $this->add(new TestCommand('2'));
+        $this->add(new TestCommand('3'));
+        $this->add(new TestCommand('1'));
 
-        $this->isFullAfter('1')->shouldReturn(false);
+        $this->getCountAfterAdding(new TestCommand('1'))->shouldReturn(3);
     }
 
-    function it_is_full_after_adding_a_new_id()
+    function it_returns_count_after_adding_a_command_with_new_code()
     {
-        $this->add('1', new TestCommand('1'));
-        $this->add('2', new TestCommand('2'));
-        $this->add('3', new TestCommand('3'));
+        $this->add(new TestCommand('1'));
+        $this->add(new TestCommand('2'));
+        $this->add(new TestCommand('3'));
 
-        $this->isFullAfter('4')->shouldReturn(true);
+        $this->getCountAfterAdding(new TestCommand('4'))->shouldReturn(4);
     }
 
-    function it_returns_commands()
+    function it_returns_acccumulated_data()
     {
         $commands = [
-            ['1', new TestCommand('1')],
-            ['1', new TestCommand('2')],
-            ['2', new TestCommand('3')],
+            new TestCommand('1', ['color' => 'red', 'width' => 1]),
+            new TestCommand('2', ['color' => 'green', 'height' => 2]),
+            new TestCommand('1', ['depth' => 3]),
+            new TestCommand('2', ['form' => 'round']),
+            new TestCommand('3', ['color' => 'blue']),
         ];
 
-        foreach ($commands as $commandData) {
-            $this->add($commandData[0], $commandData[1]);
+        foreach ($commands as $command) {
+            $this->add($command);
         }
 
-        $this->getCommands()->shouldBe(array_column($commands, 1));
+        $this->getAccumulatedData()->shouldBe([
+            '1' => ['identifier' => '1', 'color' => 'red', 'width' => 1, 'depth' => 3],
+            '2' => ['identifier' => '2', 'color' => 'green', 'height' => 2, 'form' => 'round'],
+            '3' => ['identifier' => '3', 'color' => 'blue']
+        ]);
     }
 
     function it_clears()
     {
-        $this->add('1', new TestCommand('1'));
-        $this->add('2', new TestCommand('2'));
+        $this->add(new TestCommand('1'));
+        $this->add(new TestCommand('2'));
 
         $this->clear();
 

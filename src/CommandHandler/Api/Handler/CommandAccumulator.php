@@ -3,38 +3,64 @@
 namespace Aa\AkeneoImport\CommandHandler\Api\Handler;
 
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
+use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class CommandAccumulator
 {
-    /**
-     * @var int
-     */
-    private $maxBatchSize;
-
     /**
      * @var array|CommandInterface[]
      */
     private $commands = [];
 
     /**
+     * @var array[]
+     */
+    private $normalizedData = [];
+
+    /**
      * @var array|string[]
      */
-    private $ids = [];
+    private $addedCommandCodes = [];
 
-    public function __construct(int $maxBatchSize)
+    /**
+     * @var NormalizerInterface
+     */
+    private $normalizer;
+
+    /**
+     * @var string
+     */
+    private $commandUniqueProperty;
+
+    public function __construct(NormalizerInterface $normalizer, string $commandUniqueProperty)
     {
-        $this->maxBatchSize = $maxBatchSize;
+        $this->normalizer = $normalizer;
+        $this->commandUniqueProperty = $commandUniqueProperty;
     }
 
-    public function add(string $id, CommandInterface $command)
+    public function add(CommandInterface $command)
     {
-        $this->commands[] = $command;
-        $this->ids = $this->getUniqueIds($id);
+        $commandData = $this->getNormalizedData($command);
+        $commandCode = $commandData[$this->commandUniqueProperty];
+
+        $this->commands[$commandCode] = $command;
+        $this->normalizedData[$commandCode] = array_merge($this->normalizedData[$commandCode] ?? [], $commandData);
+
+        $this->addedCommandCodes = $this->getUniqueCodesAfterAdding($commandCode);
     }
 
-    public function isFullAfter(string $id): bool
+    public function getCountAfterAdding(CommandInterface $command): int
     {
-        return count($this->getUniqueIds($id)) > $this->maxBatchSize;
+        $commandData = $this->getNormalizedData($command);
+        $commandCode = $commandData[$this->commandUniqueProperty];
+
+        return count($this->getUniqueCodesAfterAdding($commandCode));
+    }
+
+    public function getAccumulatedData(): array
+    {
+        return $this->normalizedData;
     }
 
     public function getCommands(): iterable
@@ -45,11 +71,25 @@ class CommandAccumulator
     public function clear(): void
     {
         $this->commands = [];
-        $this->ids = [];
+        $this->normalizedData = [];
+        $this->addedCommandCodes = [];
     }
 
-    private function getUniqueIds(string $id): array
+    private function getUniqueCodesAfterAdding(string $code): array
     {
-        return array_unique(array_merge($this->ids, [$id]));
+        return array_unique(array_merge($this->addedCommandCodes, [$code]));
+    }
+
+    private function getNormalizedData(CommandInterface $command)
+    {
+        // @todo: add caching?
+
+        $data = $this->normalizer->normalize($command);
+
+        if (false === is_array($data)) {
+            throw new CommandHandlerException('Normalizer must returmn array');
+        }
+
+        return $data;
     }
 }

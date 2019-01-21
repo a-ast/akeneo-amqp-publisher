@@ -2,6 +2,7 @@
 
 namespace Aa\AkeneoImport\CommandHandler\Api\Handler;
 
+use Aa\AkeneoImport\CommandHandler\Api\CommandClassHelper;
 use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Control\FinishImport;
@@ -18,47 +19,46 @@ class UpsertableHandler implements CommandHandlerInterface
     private $api;
 
     /**
-     * @var NormalizerInterface
-     */
-    private $normalizer;
-
-
-    /**
      * @var CommandAccumulator
      */
     private $accumulator;
 
-    public function __construct(UpsertableResourceListInterface $api, NormalizerInterface $normalizer, int $batchSize = 100)
+    /**
+     * @var int
+     */
+    private $batchSize;
+
+    /**
+     * @var string
+     */
+    private $commandUniqueProperty;
+
+    public function __construct(UpsertableResourceListInterface $api, string $commandUniqueProperty, NormalizerInterface $normalizer, int $batchSize = 100)
     {
         $this->api = $api;
-        $this->normalizer = $normalizer;
-        $this->accumulator = new CommandAccumulator($batchSize);
+        $this->accumulator = new CommandAccumulator($normalizer, $commandUniqueProperty);
+        $this->batchSize = $batchSize;
+        $this->commandUniqueProperty = $commandUniqueProperty;
     }
 
     public function handle(CommandInterface $command)
     {
         if ($command instanceof FinishImport) {
-            $this->sendCommands($this->accumulator->getCommands());
+            $this->sendCommands();
 
             return;
         }
 
-        $commandCode = $this->getEntityUniqueCode($command);
-
-        if ($this->accumulator->isFullAfter($commandCode)) {
-            $this->sendCommands($this->accumulator->getCommands());
+        if ($this->accumulator->getCountAfterAdding($command) > $this->batchSize) {
+            $this->sendCommands();
         }
 
-        $this->accumulator->add($commandCode, $command);
+        $this->accumulator->add($command);
     }
 
-    private function sendCommands(iterable $commands)
+    private function sendCommands()
     {
-        $commandData = $this->normalizer->normalize($commands);
-
-        if (!is_array($commandData)) {
-            throw new CommandHandlerException('Normalizer must return an array');
-        }
+        $commandData = $this->accumulator->getAccumulatedData();
 
         if (0 === count($commandData)) {
             return;
@@ -71,18 +71,16 @@ class UpsertableHandler implements CommandHandlerInterface
         $this->accumulator->clear();
 
         foreach ($upsertedResources as $upsertedResource) {
+
+            // gather all failed command codes and return them back with an exception
+
+            // take $codePropertyName
+
+
             if (422 === $upsertedResource['status_code']) {
                 throw new CommandHandlerException($upsertedResource['message']);
             }
         }
     }
 
-    private function getEntityUniqueCode(CommandInterface $command)
-    {
-        if ($command instanceof ProductFieldInterface) {
-            return $command->getProductIdentifier();
-        }
-
-        return $command->getProductModelCode();
-    }
 }

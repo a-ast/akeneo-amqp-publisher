@@ -2,6 +2,7 @@
 
 namespace spec\Aa\AkeneoImport\CommandHandler\Api\Handler;
 
+use Aa\AkeneoImport\CommandHandler\Api\Handler\CommandAccumulator;
 use Aa\AkeneoImport\CommandHandler\Api\Handler\UpsertableHandler;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Control\FinishImport;
@@ -17,7 +18,15 @@ class UpsertableHandlerSpec extends ObjectBehavior
 {
     function let(UpsertableResourceListInterface $api, NormalizerInterface $normalizer)
     {
-        $this->beConstructedWith($api, $normalizer, 2);
+        $normalizer
+            ->normalize(Argument::type(TestCommand::class), Argument::any(), Argument::any())
+            ->will(function(array $commands) {
+                $command = $commands[0];
+
+                return array_merge(['identifier' => $command->getProductIdentifier()], $command->getAttributes());
+            });
+
+        $this->beConstructedWith($api, 'identifier', $normalizer, 2);
     }
 
     function it_is_initializable()
@@ -25,38 +34,28 @@ class UpsertableHandlerSpec extends ObjectBehavior
         $this->shouldHaveType(UpsertableHandler::class);
     }
 
-    function it_handles_one_command(UpsertableResourceListInterface $api, NormalizerInterface $normalizer)
+    function it_handles_one_command(UpsertableResourceListInterface $api)
     {
-        $normalizer->normalize(Argument::type('array'))->willReturn([['productIdentifier' => 1]]);
-
-        $api->upsertList([
-            ['productIdentifier' => 1],
-
-        ])->shouldBeCalled()->willReturn([]);
+        $api->upsertList(Argument::type('array'))->shouldBeCalled()->willReturn([]);
 
         $this->handle(new TestCommand('1'));
         $this->handle(new FinishImport());
     }
 
-    function it_handles_commands_and_sends_data_in_batches(UpsertableResourceListInterface $api, NormalizerInterface $normalizer)
+    function it_handles_commands_and_sends_data_in_batches(UpsertableResourceListInterface $api)
     {
-        $normalizer->normalize(Argument::type('array'))->willReturn([]);
+        $api->upsertList(Argument::type('array'))->shouldBeCalledTimes(3)->willReturn([]);
 
-        $api->upsertList(Argument::type('array'))->shouldBeCalledTimes(2)->willReturn([]);
-
-        $this->handle(new TestCommand(1));
-        $this->handle(new TestCommand(2));
-        $this->handle(new TestCommand(1));
-        $this->handle(new TestCommand(2));
-        $this->handle(new TestCommand(3));
-        $this->handle(new TestCommand(3));
-        $this->handle(new TestCommand(4));
+        $this->handle(new TestCommand('1'));
+        $this->handle(new TestCommand('2'));
+        $this->handle(new TestCommand('3'));
+        $this->handle(new TestCommand('4'));
+        $this->handle(new TestCommand('5'));
         $this->handle(new FinishImport());
     }
 
-    function it_does_not_send_empty_commands(UpsertableResourceListInterface $api, NormalizerInterface $normalizer)
+    function it_does_not_send_empty_commands(UpsertableResourceListInterface $api)
     {
-        $normalizer->normalize(Argument::type('array'))->willReturn([]);
         $api->upsertList(Argument::any())->shouldNotBeCalled();
 
         $this->handle(new FinishImport());

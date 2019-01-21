@@ -2,9 +2,11 @@
 
 namespace Aa\AkeneoImport\CommandHandler\Api;
 
+use Aa\AkeneoImport\CommandHandler\Api\Handler\CommandAccumulator;
 use Aa\AkeneoImport\CommandHandler\Api\Handler\DeleteHandler;
 use Aa\AkeneoImport\CommandHandler\Api\Handler\MediaHandler;
 use Aa\AkeneoImport\CommandHandler\Api\Handler\UpsertableHandler;
+use Aa\AkeneoImport\CommandHandler\Normalizer\CommandNormalizer;
 use Aa\AkeneoImport\ImportCommand\Control\FinishImport;
 use Aa\AkeneoImport\ImportCommand\Media\CreateProductMediaFile;
 use Aa\AkeneoImport\ImportCommand\Media\CreateProductModelMediaFile;
@@ -24,18 +26,25 @@ class ApiCommandHandlerFactory
 {
     public function createByApiClient(AkeneoPimClientInterface $client): array
     {
-        $normalizer = $this->createSerializer();
+        $propertyReplacementMap = [
+            'productIdentifier' => 'identifier',
+            'productModelCode' => 'code',
+            'categoryCode' => 'code',
+        ];
+
+        $normalizer = $this->createSerializer($propertyReplacementMap);
 
         $upsertableProductHandler = new UpsertableHandler(
             $client->getProductApi(),
+            'identifier',
             $normalizer
         );
 
         $upsertableProductModelHandler = new UpsertableHandler(
             $client->getProductModelApi(),
+            'code',
             $normalizer
         );
-
 
         return [
             DeleteProduct::class => new DeleteHandler($client->getProductApi()),
@@ -55,9 +64,10 @@ class ApiCommandHandlerFactory
         return $this->createByApiClient($client);
     }
 
-    private function createSerializer(): NormalizerInterface
+    private function createSerializer(array $propertyReplacementMap): NormalizerInterface
     {
         $normalizers = [
+            new CommandNormalizer($propertyReplacementMap),
             new DateTimeNormalizer(),
             new DateIntervalNormalizer(),
             new ArrayDenormalizer(),
