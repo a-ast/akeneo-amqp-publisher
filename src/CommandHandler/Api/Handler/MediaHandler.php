@@ -49,7 +49,7 @@ class MediaHandler implements CommandHandlerInterface
                 'attribute' => $command->getAttributeCode(),
                 'scope' => $command->getScope(),
                 'locale' => $command->getLocale(),
-                'type' => 'product',
+                'type' => 'product_model',
             ];
         }
 
