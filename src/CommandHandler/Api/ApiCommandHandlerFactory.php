@@ -15,6 +15,7 @@ use Aa\AkeneoImport\ImportCommand\Product\ProductFieldInterface;
 use Aa\AkeneoImport\ImportCommand\ProductModel\ProductModelFieldInterface;
 use Akeneo\Pim\ApiClient\AkeneoPimClientBuilder;
 use Akeneo\Pim\ApiClient\AkeneoPimClientInterface;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
@@ -27,8 +28,8 @@ class ApiCommandHandlerFactory
     public function createByApiClient(AkeneoPimClientInterface $client): array
     {
         $propertyReplacementMap = [
-            'productIdentifier' => 'identifier',
-            'productModelCode' => 'code',
+            'product_identifier' => 'identifier',
+            'product_model_code' => 'code',
             'categoryCode' => 'code',
         ];
 
@@ -66,12 +67,14 @@ class ApiCommandHandlerFactory
 
     private function createSerializer(array $propertyReplacementMap): NormalizerInterface
     {
+        $nameConverter = new CamelCaseToSnakeCaseNameConverter();
+
         $normalizers = [
             new CommandNormalizer($propertyReplacementMap),
             new DateTimeNormalizer(),
             new DateIntervalNormalizer(),
             new ArrayDenormalizer(),
-            new ObjectNormalizer(),
+            new ObjectNormalizer(null, $nameConverter),
         ];
 
         $serializer = new Serializer($normalizers, []);

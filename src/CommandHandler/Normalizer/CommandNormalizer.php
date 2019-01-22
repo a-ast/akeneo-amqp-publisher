@@ -23,7 +23,7 @@ class CommandNormalizer implements NormalizerInterface, NormalizerAwareInterface
 
     public function normalize($object, $format = null, array $context = [])
     {
-        $data = $this->normalizer->normalize($object, $format, $context);
+        $data = $this->normalizer->normalize($object, null, $context);
 
         foreach ($this->propertyNameReplaceMap as $replacingProperty => $property) {
 
@@ -42,6 +42,6 @@ class CommandNormalizer implements NormalizerInterface, NormalizerAwareInterface
 
     public function supportsNormalization($data, $format = null)
     {
-        return $data instanceof CommandInterface;
+        return $data instanceof CommandInterface && 'standard' === $format;
     }
 }

@@ -84,7 +84,7 @@ class CommandAccumulator
     {
         // @todo: add caching?
 
-        $data = $this->normalizer->normalize($command);
+        $data = $this->normalizer->normalize($command, 'standard');
 
         if (false === is_array($data)) {
             throw new CommandHandlerException('Normalizer must returmn array');
