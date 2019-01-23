@@ -16,7 +16,6 @@
         "enqueue/dsn": "^0.9.2",
         "symfony/serializer": "^4.2",
         "symfony/property-access": "^4.2",
-        "symfony/messenger": "^4.2",
         "php-http/guzzle6-adapter": "^1.1"
     },
     "autoload": {
