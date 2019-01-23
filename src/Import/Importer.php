@@ -11,7 +11,7 @@ class Importer implements ImporterInterface
 {
 
     /**
-     * @var \Aa\AkeneoImport\Import\ImporterInterface
+     * @var CommandBus
      */
     private $commandBus;
 
