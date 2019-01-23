@@ -2,33 +2,75 @@
 
 namespace Aa\AkeneoImport\Import;
 
-use Aa\AkeneoImport\CommandBus\CommandBusFactory;
 use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
-use Aa\AkeneoImport\ImportCommand\Control\FinishImport;
-
+use Aa\AkeneoImport\ImportCommand\CommandInterface;
+use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
+use Aa\AkeneoImport\ImportCommand\InitializableCommandHandlerInterface;
 
 class Importer
 {
     /**
-     * @var \Aa\AkeneoImport\CommandBus\CommandBusFactory
+     * @var iterable|CommandHandlerInterface[]
      */
-    private $commandBusFactory;
+    private $handlers;
 
-    public function __construct(CommandBusFactory $commandBusFactory)
+    public function __construct(iterable $handlers)
     {
-        $this->commandBusFactory = $commandBusFactory;
+        $this->handlers = $handlers;
     }
 
-    public function import(iterable $commands, array $handlers)
+    public function import(iterable $commands)
     {
-        // @todo: generate import id and send with envelope
-
-        $bus = $this->commandBusFactory->createCommandBus($handlers);
+        $this->setUpHandlers();
 
         foreach ($commands as $command) {
-            $bus->dispatch($command);
+
+            $handler = $this->findHandlerFor($command);
+            $handler->handle($command);
         }
 
-        $bus->dispatch(new FinishImport());
+        $this->tearDownHandlers();
+    }
+
+    private function getCommandTypes(CommandInterface $command)
+    {
+        $class = get_class($command);
+
+        return [$class] + array_values(class_parents($class)) + array_values(class_implements($class));
+    }
+
+    private function setUpHandlers(): void
+    {
+        foreach ($this->handlers as $handler) {
+            if ($handler instanceof InitializableCommandHandlerInterface) {
+                $handler->setUp();
+            }
+        }
+    }
+
+    private function tearDownHandlers(): void
+    {
+        foreach ($this->handlers as $handler) {
+            if ($handler instanceof InitializableCommandHandlerInterface) {
+                $handler->tearDown();
+            }
+        }
+    }
+
+    private function findHandlerFor(CommandInterface $command): CommandHandlerInterface
+    {
+        $commandTypes = $this->getCommandTypes($command);
+        $availableTypes = array_keys($this->handlers);
+
+        $supportedTypes = array_intersect($commandTypes, $availableTypes);
+
+        $firstSupportedType = array_shift($supportedTypes);
+
+        if (null === $firstSupportedType) {
+            throw new CommandHandlerException(sprintf('No handler found for the command %s', get_class($command)));
+        }
+
+        return $this->handlers[$firstSupportedType];
+
     }
 }

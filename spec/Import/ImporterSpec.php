@@ -2,46 +2,115 @@
 
 namespace spec\Aa\AkeneoImport\Import;
 
-use Aa\AkeneoImport\CommandBus\CommandBusFactory;
 use Aa\AkeneoImport\Import\Importer;
 use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
+use Aa\AkeneoImport\ImportCommand\CommandInterface;
+use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
+use Aa\AkeneoImport\ImportCommand\InitializableCommandHandlerInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class ImporterSpec extends ObjectBehavior
 {
-    function let(CommandBusFactory $factory,
-        CommandHandlerInterface $handler,
-        MessageBusInterface $bus
-    ) {
-        $factory->createCommandBus([$handler])->willReturn($bus);
-        $bus->dispatch(Argument::any())->willReturn(new Envelope(new class {}));
+    function it_redirects_commands_to_handlers(CommandHandlerInterface $handler1, CommandHandlerInterface $handler2)
+    {
+        $command1 = new class implements CommandInterface {};
+        $command2 = new class implements CommandInterface {};
 
-        $this->beConstructedWith($factory);
+        $handlers = [
+            get_class($command1) => $handler1,
+            get_class($command2) => $handler2,
+        ];
+
+        $this->beConstructedWith($handlers);
+
+        $handler1->handle($command1)->shouldBeCalled();
+        $handler2->handle($command2)->shouldBeCalled();
+
+        $this->import([$command1, $command2]);
     }
 
-    function it_is_initializable()
+    function it_redirects_commands_to_handlers_by_interface(CommandHandlerInterface $handler)
     {
-        $this->shouldHaveType(Importer::class);
+        $command = new class implements CommandInterface, CommonCommandInterface {};
+
+        $handlers = [
+            CommonCommandInterface::class => $handler,
+        ];
+
+        $this->beConstructedWith($handlers);
+
+        $handler->handle($command)->shouldBeCalled();
+
+        $this->import([$command]);
     }
 
-    function it_imports_array_of_command(CommandHandlerInterface $handler)
+    /**
+     * Note: not possible to use interface for the parameter $handler because of the bug:
+     * https://github.com/phpspec/prophecy/issues/192
+     * Because of that, there is a fake class InitializableCommandHandler
+     */
+    function it_initialize_and_finalize_handlers_that_support_it(InitializableCommandHandler $handler)
     {
-        $this->import([], [$handler]);
+        $command = new class implements CommandInterface {};
+
+        $handlers = [
+            get_class($command) => $handler,
+        ];
+
+        $this->beConstructedWith($handlers);
+
+        $handler->setUp()->shouldBeCalled();
+        $handler->tearDown()->shouldBeCalled();
+        $handler->handle($command)->shouldBeCalled();
+
+        $this->import([$command]);
     }
 
     function it_imports_commands_provided_by_generator(CommandHandlerInterface $handler)
     {
+        $handlers = [
+            Command::class => $handler,
+        ];
+
+        $this->beConstructedWith($handlers);
+
         $generator = new class {
 
             public function getCommands(): iterable
             {
-                yield new class {};
+                yield new Command();
             }
         };
 
-        $this->import($generator->getCommands(), [$handler]);
+        $this->import($generator->getCommands());
     }
+
+    function it_throws_an_exception_if_handler_not_found(CommandHandlerInterface $handler)
+    {
+        $command = new class implements CommandInterface {};
+
+        $handlers = [
+            UnknownCommandInterface::class => $handler,
+        ];
+
+        $this->beConstructedWith($handlers);
+
+        $this->shouldThrow(CommandHandlerException::class)->during('import', [[$command]]);
+    }
+}
+
+interface CommonCommandInterface {}
+
+interface UnknownCommandInterface {}
+
+class Command implements CommandInterface {};
+
+class InitializableCommandHandler implements InitializableCommandHandlerInterface
+{
+    public function setUp() {}
+
+    public function tearDown() {}
+
+    public function handle(CommandInterface $command) {}
 }

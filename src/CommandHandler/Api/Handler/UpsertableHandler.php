@@ -7,11 +7,12 @@ use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Control\FinishImport;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
+use Aa\AkeneoImport\ImportCommand\InitializableCommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\Product\ProductFieldInterface;
 use Akeneo\Pim\ApiClient\Api\Operation\UpsertableResourceListInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class UpsertableHandler implements CommandHandlerInterface
+class UpsertableHandler implements InitializableCommandHandlerInterface
 {
     /**
      * @var UpsertableResourceListInterface
@@ -83,4 +84,13 @@ class UpsertableHandler implements CommandHandlerInterface
         }
     }
 
+    public function setUp()
+    {
+        // TODO: Implement setUp() method.
+    }
+
+    public function tearDown()
+    {
+        // TODO: Implement tearDown() method.
+    }
 }
