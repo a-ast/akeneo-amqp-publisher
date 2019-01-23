@@ -40,7 +40,7 @@ class CommandNormalizerSpec extends ObjectBehavior
 
     function it_supports_normalization_for_commands(CommandInterface $command)
     {
-        $this->supportsNormalization($command, Argument::any())->shouldBe(true);
+        $this->supportsNormalization($command, 'standard')->shouldBe(true);
     }
 
     function it_does_not_support_normalization_for_non_commands()

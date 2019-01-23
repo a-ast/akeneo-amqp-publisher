@@ -7,14 +7,14 @@ use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
 use Aa\AkeneoImport\ImportCommand\InitializableCommandHandlerInterface;
 
-class Importer
+class Importer implements ImporterInterface
 {
     /**
-     * @var iterable|CommandHandlerInterface[]
+     * @var CommandHandlerInterface[]
      */
     private $handlers;
 
-    public function __construct(iterable $handlers)
+    public function __construct(array $handlers)
     {
         $this->handlers = $handlers;
     }
