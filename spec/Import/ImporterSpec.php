@@ -3,77 +3,90 @@
 namespace spec\Aa\AkeneoImport\Import;
 
 use Aa\AkeneoImport\CommandBus\CommandBus;
-use Aa\AkeneoImport\Import\Importer;
-use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
 use Aa\AkeneoImport\ImportCommand\Exception\RecoverableCommandHandlerException;
 use Aa\AkeneoImport\Queue\CommandQueueInterface;
-use Aa\AkeneoImport\Queue\InMemoryQueue;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
 class ImporterSpec extends ObjectBehavior
 {
-    function let(CommandBus $commandBus, CommandQueueInterface $queue)
+    function let(CommandBus $commandBus)
     {
-        $this->beConstructedWith($commandBus, $queue);
+        $this->beConstructedWith($commandBus);
     }
 
-    function it_imports_command_data(CommandBus $commandBus, CommandQueueInterface $queue)
+    function it_imports_command_from_array(CommandBus $commandBus)
     {
         $command1 = new Command(1);
         $command2 = new Command(2);
 
-        $queue->enqueue($command1)->shouldBeCalled();
-        $queue->enqueue($command2)->shouldBeCalled();
-
-        $queue->dequeue()->willReturn($command1, $command2, null);
-
+        $commandBus->setUp()->shouldBeCalled();
         $commandBus->dispatch($command1)->shouldBeCalled();
         $commandBus->dispatch($command2)->shouldBeCalled();
+        $commandBus->tearDown()->shouldBeCalled();
 
         $this->import([$command1, $command2]);
     }
 
-    function it_republishes_failed_recoverable_commands(CommandBus $commandBus, CommandQueueInterface $queue)
+    function it_imports_command_from_queue(CommandBus $commandBus, CommandQueueInterface $queue)
     {
         $command1 = new Command(1);
         $command2 = new Command(2);
 
         $queue->dequeue()->willReturn($command1, $command2, null);
 
-        $exception = new RecoverableCommandHandlerException('Recover', 0, [$command2]);
+        $commandBus->setUp()->shouldBeCalled();
         $commandBus->dispatch($command1)->shouldBeCalled();
-        $commandBus->dispatch($command2)->willThrow($exception);
-
-        $queue->enqueue($command1)->shouldBeCalled();
-        $queue->enqueue($command2)->shouldBeCalledTimes(2);
+        $commandBus->dispatch($command2)->shouldBeCalled();
+        $commandBus->tearDown()->shouldBeCalled();
 
         $this->import([$command1, $command2]);
     }
 
-    function it_does_not_republish_failed_unrecoverable_commands(CommandBus $commandBus, CommandQueueInterface $queue)
+
+    function it_republishes_failed_recoverable_commands(CommandBus $commandBus)
+    {
+        $command1 = new Command(1);
+        $command2 = new Command(2);
+        $command3 = new Command(3);
+
+        $commandBus->setUp()->shouldBeCalled();
+        $commandBus->tearDown()->shouldBeCalled();
+
+        $exception = new RecoverableCommandHandlerException('Recover', 0, [$command2]);
+        $commandBus->dispatch($command1)->shouldBeCalledTimes(1);
+        $commandBus->dispatch($command2)->shouldBeCalledTimes(2);
+        $commandBus->dispatch($command3)->shouldBeCalledTimes(1)->willThrow($exception);
+
+        $this->import([$command1, $command2, $command3]);
+    }
+
+    function it_does_not_republish_failed_unrecoverable_commands(CommandBus $commandBus)
     {
         $command = new Command(1);
 
-        $queue->dequeue()->willReturn($command, null);
+        $commandBus->setUp()->shouldBeCalled();
+        $commandBus->tearDown()->shouldBeCalled();
 
-        $commandBus->dispatch($command)->willThrow(CommandHandlerException::class);
-        $queue->enqueue($command)->shouldBeCalledTimes(1);
+        $commandBus->dispatch($command)
+            ->shouldBeCalledTimes(1)
+            ->willThrow(CommandHandlerException::class);
 
         $this->import([$command]);
     }
 
-    function it_import_stops_for_all_other_exceptions(CommandBus $commandBus, CommandQueueInterface $queue)
+    function it_stops_for_all_other_exceptions(CommandBus $commandBus, \Exception $exception)
     {
         $command = new Command(1);
 
-        $queue->dequeue()->willReturn($command, null);
+        $commandBus->setUp()->shouldBeCalled();
+        $commandBus->tearDown()->shouldNotBeCalled();
 
-        $commandBus->dispatch($command)->willThrow(\Exception::class);
+        $commandBus->dispatch($command)->willThrow($exception->getWrappedObject());
 
-        $this->shouldThrow(\Exception::class)->during('import', [[$command]]);
+        $this->shouldThrow($exception->getWrappedObject())->during('import', [[$command]]);
     }
 }
 

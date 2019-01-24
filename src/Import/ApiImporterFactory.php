@@ -55,7 +55,7 @@ class ApiImporterFactory
             ProductModelFieldInterface::class => $upsertableProductModelHandler,
         ];
 
-        return new Importer(new CommandBus($handlers), new InMemoryQueue());
+        return new Importer(new CommandBus($handlers));
     }
 
     public function createByCredentials(string $baseUri, string $clientId, string $secret, string $username, string $password): ImporterInterface

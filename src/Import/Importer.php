@@ -6,6 +6,7 @@ use Aa\AkeneoImport\CommandBus\CommandBus;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
 use Aa\AkeneoImport\ImportCommand\Exception\RecoverableCommandHandlerException;
 use Aa\AkeneoImport\Queue\CommandQueueInterface;
+use Aa\AkeneoImport\Queue\InMemoryQueue;
 
 class Importer implements ImporterInterface
 {
@@ -14,27 +15,19 @@ class Importer implements ImporterInterface
      */
     private $commandBus;
 
-    /**
-     * @var \Aa\AkeneoImport\Queue\CommandQueueInterface
-     */
-    private $queue;
-
-    public function __construct(CommandBus $commandBus, CommandQueueInterface $queue)
+    public function __construct(CommandBus $commandBus)
     {
         $this->commandBus = $commandBus;
-        $this->queue = $queue;
     }
 
     public function import(iterable $commands)
     {
-        foreach ($commands as $command) {
-            $this->queue->enqueue($command);
-        }
+        $queue = $this->getQueue($commands);
 
         $this->commandBus->setUp();
 
         do {
-            $command = $this->queue->dequeue();
+            $command = $queue->dequeue();
 
             if (null === $command) {
                 break;
@@ -46,7 +39,7 @@ class Importer implements ImporterInterface
 
             } catch (RecoverableCommandHandlerException $e) {
 
-                $this->publishFailedCommands($e->getCommands());
+                $this->publishFailedCommands($queue, $e->getCommands());
 
             } catch (CommandHandlerException $e) {
 
@@ -58,10 +51,19 @@ class Importer implements ImporterInterface
         $this->commandBus->tearDown();
     }
 
-    private function publishFailedCommands(iterable $commands): void
+    private function publishFailedCommands(CommandQueueInterface $queue, iterable $commands): void
     {
         foreach ($commands as $failedCommand) {
-            $this->queue->enqueue($failedCommand);
+            $queue->enqueue($failedCommand);
         }
+    }
+
+    private function getQueue(iterable $commands): CommandQueueInterface
+    {
+        if (!$commands instanceof CommandQueueInterface) {
+            return new InMemoryQueue($commands);
+        }
+
+        return $commands;
     }
 }

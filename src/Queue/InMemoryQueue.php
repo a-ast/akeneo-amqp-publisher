@@ -11,9 +11,13 @@ class InMemoryQueue implements CommandQueueInterface
      */
     private $queue;
 
-    public function __construct()
+    public function __construct(iterable $commands = [])
     {
         $this->queue = new \SplQueue();
+
+        foreach ($commands as $command) {
+            $this->enqueue($command);
+        }
     }
 
     public function enqueue(CommandInterface $command)

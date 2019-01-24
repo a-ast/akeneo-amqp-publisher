@@ -16,6 +16,14 @@ class InMemoryQueueSpec extends ObjectBehavior
         $this->shouldImplement(CommandQueueInterface::class);
     }
 
+    function it_can_be_created_from_iterable(CommandInterface $command)
+    {
+        $this->beConstructedWith([$command]);
+
+        $this->dequeue()->shouldReturn($command);
+    }
+
+
     function it_enqueues_a_command_and_it_can_be_dequeued(CommandInterface $command)
     {
         $this->enqueue($command);

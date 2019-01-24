@@ -39,7 +39,7 @@ class UpsertableHandlerSpec extends ObjectBehavior
         $api->upsertList(Argument::type('array'))->shouldBeCalled()->willReturn([]);
 
         $this->handle(new TestCommand('1'));
-        $this->handle(new FinishImport());
+        $this->tearDown();
     }
 
     function it_handles_commands_and_sends_data_in_batches(UpsertableResourceListInterface $api)
@@ -51,13 +51,6 @@ class UpsertableHandlerSpec extends ObjectBehavior
         $this->handle(new TestCommand('3'));
         $this->handle(new TestCommand('4'));
         $this->handle(new TestCommand('5'));
-        $this->handle(new FinishImport());
-    }
-
-    function it_does_not_send_empty_commands(UpsertableResourceListInterface $api)
-    {
-        $api->upsertList(Argument::any())->shouldNotBeCalled();
-
-        $this->handle(new FinishImport());
+        $this->tearDown();
     }
 }
