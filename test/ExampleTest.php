@@ -3,6 +3,7 @@
 namespace Test\Aa\AkeneoImport;
 
 use Aa\AkeneoImport\Import\ApiImporterFactory;
+use Aa\AkeneoImport\Import\ImporterInterface;
 use Aa\AkeneoImport\ImportCommand;
 use Aa\ArrayDiff\Calculator;
 use Aa\ArrayDiff\Matcher\SimpleMatcher;
@@ -11,13 +12,27 @@ use Test\Aa\AkeneoImport\Fake\FakeApiClient;
 
 class ExampleTest extends TestCase
 {
-    public function test_import_product_builder()
+
+    /**
+     * @var FakeApiClient
+     */
+    private $client;
+
+    /**
+     * @var ImporterInterface
+     */
+    private $importer;
+
+    protected function setUp()
     {
-        $client = new FakeApiClient();
+        $this->client = new FakeApiClient();
 
         $factory = new ApiImporterFactory();
-        $importer = $factory->createByApiClient($client);
+        $this->importer = $factory->createByApiClient($this->client);
+    }
 
+    public function test_import_product_builder()
+    {
         $commandBuilder = new ImportCommand\Product\ProductCommandBuilder('1');
         $commandBuilder
             ->setFamily('t-shirt')
@@ -27,7 +42,7 @@ class ExampleTest extends TestCase
             ->addValue('size', 'M', null, 'web')
         ;
 
-        $importer->import($commandBuilder->getCommands());
+        $this->importer->import($commandBuilder->getCommands());
 
         $upsertData = [
             'identifier' => '1',
@@ -48,12 +63,12 @@ class ExampleTest extends TestCase
             ['api' => 'product', $upsertData],
         ];
 
-        $requestLog = $client->getRequestLog();
+        $requestLog = $this->client->getRequestLog();
 
-        $this->aseertArraysAreEqual($requestLog, $expected);
+        $this->assertArraysAreEqual($requestLog, $expected);
     }
 
-    private function aseertArraysAreEqual(array $actual, array $expected): void
+    private function assertArraysAreEqual(array $actual, array $expected): void
     {
         $diffCalc = new Calculator(new SimpleMatcher());
         $diff = $diffCalc->calculateDiff($actual, $expected);
