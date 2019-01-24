@@ -19,27 +19,20 @@ class CommandBus
         $this->handlers = $handlers;
     }
 
-    public function dispatch(iterable $commands)
+    public function dispatch(CommandInterface $command)
     {
-        $this->setUpHandlers();
-
-        foreach ($commands as $command) {
-
-            $handler = $this->findHandlerFor($command);
-            $handler->handle($command);
-        }
-
-        $this->tearDownHandlers();
+        $handler = $this->findHandlerFor($command);
+        $handler->handle($command);
     }
 
-    private function getCommandTypes(CommandInterface $command)
+    private function getCommandTypes(CommandInterface $command): array
     {
         $class = get_class($command);
 
         return [$class] + array_values(class_parents($class)) + array_values(class_implements($class));
     }
 
-    private function setUpHandlers(): void
+    public function setUp(): void
     {
         foreach ($this->handlers as $handler) {
             if ($handler instanceof InitializableCommandHandlerInterface) {
@@ -48,7 +41,7 @@ class CommandBus
         }
     }
 
-    private function tearDownHandlers(): void
+    public function tearDown(): void
     {
         foreach ($this->handlers as $handler) {
             if ($handler instanceof InitializableCommandHandlerInterface) {

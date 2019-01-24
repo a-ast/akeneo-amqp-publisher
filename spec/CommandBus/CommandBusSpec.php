@@ -26,7 +26,8 @@ class CommandBusSpec extends ObjectBehavior
         $handler1->handle($command1)->shouldBeCalled();
         $handler2->handle($command2)->shouldBeCalled();
 
-        $this->dispatch([$command1, $command2]);
+        $this->dispatch($command1);
+        $this->dispatch($command2);
     }
 
     function it_redirects_commands_to_handlers_by_interface(CommandHandlerInterface $handler)
@@ -41,7 +42,7 @@ class CommandBusSpec extends ObjectBehavior
 
         $handler->handle($command)->shouldBeCalled();
 
-        $this->dispatch([$command]);
+        $this->dispatch($command);
     }
 
     /**
@@ -49,7 +50,7 @@ class CommandBusSpec extends ObjectBehavior
      * https://github.com/phpspec/prophecy/issues/192
      * Because of that, there is a fake class InitializableCommandHandler
      */
-    function it_initialize_and_finalize_handlers_that_support_it(InitializableCommandHandler $handler)
+    function it_initializes_handlers_that_support_it(InitializableCommandHandler $handler)
     {
         $command = new class implements CommandInterface {};
 
@@ -60,29 +61,23 @@ class CommandBusSpec extends ObjectBehavior
         $this->beConstructedWith($handlers);
 
         $handler->setUp()->shouldBeCalled();
-        $handler->tearDown()->shouldBeCalled();
-        $handler->handle($command)->shouldBeCalled();
 
-        $this->dispatch([$command]);
+        $this->setUp();
     }
 
-    function it_dispatches_commands_provided_by_generator(CommandHandlerInterface $handler)
+    function it_finalizes_handlers_that_support_it(InitializableCommandHandler $handler)
     {
+        $command = new class implements CommandInterface {};
+
         $handlers = [
-            Command::class => $handler,
+            get_class($command) => $handler,
         ];
 
         $this->beConstructedWith($handlers);
 
-        $generator = new class {
+        $handler->tearDown()->shouldBeCalled();
 
-            public function getCommands(): iterable
-            {
-                yield new Command();
-            }
-        };
-
-        $this->dispatch($generator->getCommands());
+        $this->tearDown();
     }
 
     function it_throws_an_exception_if_handler_not_found(CommandHandlerInterface $handler)
@@ -95,7 +90,7 @@ class CommandBusSpec extends ObjectBehavior
 
         $this->beConstructedWith($handlers);
 
-        $this->shouldThrow(CommandHandlerException::class)->during('dispatch', [[$command]]);
+        $this->shouldThrow(CommandHandlerException::class)->during('dispatch', [$command]);
     }
 }
 

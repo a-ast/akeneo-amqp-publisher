@@ -9,7 +9,6 @@ use Aa\AkeneoImport\Queue\CommandQueueInterface;
 
 class Importer implements ImporterInterface
 {
-
     /**
      * @var CommandBus
      */
@@ -28,15 +27,37 @@ class Importer implements ImporterInterface
 
     public function import(iterable $commands)
     {
-        try {
-            $this->commandBus->dispatch($commands);
-        } catch (RecoverableCommandHandlerException $e) {
+        foreach ($commands as $command) {
+            $this->queue->enqueue($command);
+        }
 
-            foreach ($e->getCommands() as $command) {
-                $this->queue->enqueue($command);
+        do {
+            $command = $this->queue->dequeue();
+
+            if (null === $command) {
+                break;
             }
-        } catch (CommandHandlerException $e) {
-            // do nothing
+
+            try {
+
+                $this->commandBus->dispatch($command);
+
+            } catch (RecoverableCommandHandlerException $e) {
+
+                $this->publishFailedCommands($e->getCommands());
+
+            } catch (CommandHandlerException $e) {
+
+                // do nothing
+            }
+
+        } while ($command !== null);
+    }
+
+    private function publishFailedCommands(iterable $commands): void
+    {
+        foreach ($commands as $failedCommand) {
+            $this->queue->enqueue($failedCommand);
         }
     }
 }
