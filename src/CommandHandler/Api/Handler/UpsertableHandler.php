@@ -2,13 +2,9 @@
 
 namespace Aa\AkeneoImport\CommandHandler\Api\Handler;
 
-use Aa\AkeneoImport\CommandHandler\Api\CommandClassHelper;
-use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
-use Aa\AkeneoImport\ImportCommand\Control\FinishImport;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
 use Aa\AkeneoImport\ImportCommand\InitializableCommandHandlerInterface;
-use Aa\AkeneoImport\ImportCommand\Product\ProductFieldInterface;
 use Akeneo\Pim\ApiClient\Api\Operation\UpsertableResourceListInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 

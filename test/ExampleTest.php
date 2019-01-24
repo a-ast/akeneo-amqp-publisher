@@ -28,7 +28,7 @@ class ExampleTest extends TestCase
         $this->client = new FakeApiClient();
 
         $factory = new ApiImporterFactory();
-        $this->importer = $factory->createByApiClient($this->client);
+        $this->importer = $factory->createByApiClient($this->client, 3);
     }
 
     public function test_import_product_builder()
@@ -61,6 +61,44 @@ class ExampleTest extends TestCase
 
         $expected = [
             ['api' => 'product', $upsertData],
+        ];
+
+        $requestLog = $this->client->getRequestLog();
+
+        $this->assertArraysAreEqual($requestLog, $expected);
+    }
+
+    public function test_import_products_in_batch()
+    {
+        for ($i = 1; $i <= 10; $i++) {
+            $commands[] = new ImportCommand\Product\SetEnabled($i, true);
+        }
+
+        $this->importer->import($commands);
+
+        $expected = [
+            [
+                'api' => 'product',
+                ['identifier' => '1', 'enabled' => true],
+                ['identifier' => '2', 'enabled' => true],
+                ['identifier' => '3', 'enabled' => true],
+            ],
+            [
+                'api' => 'product',
+                ['identifier' => '4', 'enabled' => true],
+                ['identifier' => '5', 'enabled' => true],
+                ['identifier' => '6', 'enabled' => true],
+            ],
+            [
+                'api' => 'product',
+                ['identifier' => '7', 'enabled' => true],
+                ['identifier' => '8', 'enabled' => true],
+                ['identifier' => '9', 'enabled' => true],
+            ],
+            [
+                'api' => 'product',
+                ['identifier' => '10', 'enabled' => true],
+            ],
         ];
 
         $requestLog = $this->client->getRequestLog();

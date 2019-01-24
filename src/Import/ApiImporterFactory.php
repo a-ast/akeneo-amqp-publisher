@@ -25,7 +25,7 @@ use Symfony\Component\Serializer\Serializer;
 
 class ApiImporterFactory
 {
-    public function createByApiClient(AkeneoPimClientInterface $client): ImporterInterface
+    public function createByApiClient(AkeneoPimClientInterface $client, int $upsertBatchSize = 100): ImporterInterface
     {
         $propertyReplacementMap = [
             'product_identifier' => 'identifier',
@@ -38,7 +38,8 @@ class ApiImporterFactory
         $upsertableProductHandler = new UpsertableHandler(
             $client->getProductApi(),
             'identifier',
-            $normalizer
+            $normalizer,
+            $upsertBatchSize
         );
 
         $upsertableProductModelHandler = new UpsertableHandler(
