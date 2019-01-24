@@ -1,1 +1,4 @@
-composer_suite_detection: true
+suites:
+    global:
+        namespace: Aa\AkeneoImport
+        psr4_prefix: Aa\AkeneoImport
