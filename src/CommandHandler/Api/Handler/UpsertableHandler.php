@@ -44,12 +44,6 @@ class UpsertableHandler implements InitializableCommandHandlerInterface
 
     public function handle(CommandInterface $command)
     {
-        if ($command instanceof FinishImport) {
-            $this->sendCommands();
-
-            return;
-        }
-
         if ($this->accumulator->getCountAfterAdding($command) > $this->batchSize) {
             $this->sendCommands();
         }
@@ -86,11 +80,11 @@ class UpsertableHandler implements InitializableCommandHandlerInterface
 
     public function setUp()
     {
-        // TODO: Implement setUp() method.
+        // no setup
     }
 
     public function tearDown()
     {
-        // TODO: Implement tearDown() method.
+        $this->sendCommands();
     }
 }

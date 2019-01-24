@@ -31,6 +31,8 @@ class Importer implements ImporterInterface
             $this->queue->enqueue($command);
         }
 
+        $this->commandBus->setUp();
+
         do {
             $command = $this->queue->dequeue();
 
@@ -52,6 +54,8 @@ class Importer implements ImporterInterface
             }
 
         } while ($command !== null);
+
+        $this->commandBus->tearDown();
     }
 
     private function publishFailedCommands(iterable $commands): void
