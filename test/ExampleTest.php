@@ -21,12 +21,31 @@ class ExampleTest extends TestCase
         $commandBuilder = new ImportCommand\Product\ProductCommandBuilder('1');
         $commandBuilder
             ->setFamily('t-shirt')
-            ->setEnabled(true);
+            ->setCategories(['clothing'])
+            ->setEnabled(true)
+            ->addValue('color', 'red', 'en_EN')
+            ->addValue('size', 'M', null, 'web')
+        ;
 
         $importer->import($commandBuilder->getCommands());
 
+        $upsertData = [
+            'identifier' => '1',
+            'categories' => ['clothing'],
+            'family' => 't-shirt',
+            'enabled' => true,
+            'values' => [
+                'color' => [
+                    ['data' => 'red', 'locale' => 'en_EN', 'scope' => null]
+                ],
+                'size' => [
+                    ['data' => 'M', 'locale' => null, 'scope' => 'web']
+                ]
+            ]
+        ];
+
         $expected = [
-            ['api' => 'product', ['identifier' => '1', 'family' => 't-shirt', 'enabled' => true]],
+            ['api' => 'product', $upsertData],
         ];
 
         $requestLog = $client->getRequestLog();
