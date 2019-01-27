@@ -23,7 +23,6 @@ class InMemoryQueueSpec extends ObjectBehavior
         $this->dequeue()->shouldReturn($command);
     }
 
-
     function it_enqueues_a_command_and_it_can_be_dequeued(CommandInterface $command)
     {
         $this->enqueue($command);
