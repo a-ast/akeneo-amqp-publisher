@@ -2,13 +2,16 @@
 
 namespace Aa\AkeneoImport\CommandHandler\Api\Handler;
 
+use Aa\AkeneoImport\CommandBus\CommandPromise;
+use Aa\AkeneoImport\ImportCommand\AsyncCommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
+use Aa\AkeneoImport\ImportCommand\Exception\RecoverableCommandHandlerException;
 use Aa\AkeneoImport\ImportCommand\InitializableCommandHandlerInterface;
 use Akeneo\Pim\ApiClient\Api\Operation\UpsertableResourceListInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class UpsertableHandler implements InitializableCommandHandlerInterface
+class UpsertableHandler implements AsyncCommandHandlerInterface, InitializableCommandHandlerInterface
 {
     /**
      * @var UpsertableResourceListInterface
@@ -30,21 +33,37 @@ class UpsertableHandler implements InitializableCommandHandlerInterface
      */
     private $commandUniqueProperty;
 
-    public function __construct(UpsertableResourceListInterface $api, string $commandUniqueProperty, NormalizerInterface $normalizer, int $batchSize = 100)
+    /**
+     * @var array|CommandPromise[]
+     */
+    private $promises;
+
+    /**
+     * @var \Symfony\Component\Serializer\Normalizer\NormalizerInterface
+     */
+    private $normalizer;
+
+    public function __construct(UpsertableResourceListInterface $api, string $commandUniqueProperty,
+        NormalizerInterface $normalizer, int $batchSize = 100)
     {
         $this->api = $api;
-        $this->accumulator = new CommandAccumulator($normalizer, $commandUniqueProperty);
+        $this->accumulator = new CommandAccumulator();
         $this->batchSize = $batchSize;
         $this->commandUniqueProperty = $commandUniqueProperty;
+        $this->normalizer = $normalizer;
     }
 
-    public function handle(CommandInterface $command)
+    public function handle(CommandPromise $command)
     {
-        if ($this->accumulator->getCountAfterAdding($command) > $this->batchSize) {
+        $commandData = $this->getNormalizedData($command->getCommand());
+        $commandCode = $commandData[$this->commandUniqueProperty];
+
+        if ($this->accumulator->getCountAfterAdding($commandCode) > $this->batchSize) {
             $this->sendCommands();
         }
 
-        $this->accumulator->add($command);
+        $this->accumulator->add($commandCode, $commandData);
+        $this->promises[$commandCode] = $command;
     }
 
     private function sendCommands()
@@ -59,7 +78,7 @@ class UpsertableHandler implements InitializableCommandHandlerInterface
 
         // @todo: checks 4XX and that it doesn't clear batches
 
-        $this->accumulator->clear();
+
 
         foreach ($upsertedResources as $upsertedResource) {
 
@@ -67,11 +86,18 @@ class UpsertableHandler implements InitializableCommandHandlerInterface
 
             // take $codePropertyName
 
-
             if (422 === $upsertedResource['status_code']) {
-                throw new CommandHandlerException($upsertedResource['message']);
+
+                $code = $upsertedResource[$this->commandUniqueProperty];
+
+                $this->promises[$code]->repeat();
+
+//                throw new RecoverableCommandHandlerException($upsertedResource['message'], 0, [$this->accumulator->getCommand($upsertedResource[$this->commandUniqueProperty])]);
             }
         }
+
+        $this->accumulator->clear();
+        $this->promises = [];
     }
 
     public function setUp()
@@ -82,5 +108,18 @@ class UpsertableHandler implements InitializableCommandHandlerInterface
     public function tearDown()
     {
         $this->sendCommands();
+    }
+
+    private function getNormalizedData(CommandInterface $command)
+    {
+        // @todo: add caching?
+
+        $data = $this->normalizer->normalize($command, 'standard');
+
+        if (false === is_array($data)) {
+            throw new CommandHandlerException('Normalizer must returmn array');
+        }
+
+        return $data;
     }
 }

@@ -10,6 +10,8 @@ class FakeApi implements UpsertableResourceListInterface, DeletableResourceInter
 {
     private $log = [];
 
+    private $responses = [];
+
     public function getRequestLog()
     {
         return $this->log;
@@ -19,7 +21,41 @@ class FakeApi implements UpsertableResourceListInterface, DeletableResourceInter
     {
         $this->log[] = $resources;
 
-        return [];
+        $response = [];
+
+        foreach ($resources as $resource) {
+
+            $entityCodeFieldName = isset($resource['identifier']) ? 'identifier' : 'code';
+            $entityCode = $resource[$entityCodeFieldName];
+
+            if (!isset($this->responses[$entityCode])) {
+                continue;
+            }
+
+            if ($this->responses[$entityCode]['times'] < 1) {
+                continue;
+            }
+
+            $response[] = [
+                $entityCodeFieldName => $entityCode,
+                'status_code' => $this->responses[$entityCode]['status_code'],
+                'message' => $this->responses[$entityCode]['message'],
+            ];
+
+            $this->responses[$entityCode]['times']--;
+        }
+
+        return $response;
+    }
+
+    public function addUpsertResponse(string $fieldName, string $entityCode, int $statusCode, string $message, int $times)
+    {
+        $this->responses[$entityCode] = [
+            'field' => $fieldName,
+            'status_code' => $statusCode,
+            'message' => $message,
+            'times' => $times,
+        ];
     }
 
     public function delete($code)

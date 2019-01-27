@@ -16,9 +16,13 @@ class Validator implements ValidatorInterface
      */
     public function validate(iterable $responses)
     {
-        // Check tolerant cases first
+
+        $entityCodes = [];
+        // Check recoverable cases first
         foreach ($responses as $response) {
-            $this->checkMissingProductParent($response);
+            if ($this->isRecoverable($response)) {
+                $entityCodes[] = $response->getEntityCode();
+            };
         }
 
         // @todo: combine errors to one for logging to know what entities failed?
@@ -30,20 +34,12 @@ class Validator implements ValidatorInterface
         }
     }
 
-    private function checkMissingProductParent(Response $response)
+    private function isRecoverable(Response $response): bool
     {
-        if (self::UNPROCESSABLE_ENTITY === $response->getStatusCode() &&
+        return (self::UNPROCESSABLE_ENTITY === $response->getStatusCode() &&
             false !== strpos(
                 $response->getMessage(),
                 'Property "parent" expects a valid parent code.'
-            )) {
-
-            throw new TolerantValidationException($response->getMessage(), $response);
-        }
-    }
-
-    public function supportsApi($api, string $commandClass)
-    {
-        return $api instanceof UpsertableResourceListInterface;
+            ));
     }
 }

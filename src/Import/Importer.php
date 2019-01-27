@@ -3,6 +3,7 @@
 namespace Aa\AkeneoImport\Import;
 
 use Aa\AkeneoImport\CommandBus\CommandBus;
+use Aa\AkeneoImport\CommandBus\CommandPromise;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
 use Aa\AkeneoImport\ImportCommand\Exception\RecoverableCommandHandlerException;
 use Aa\AkeneoImport\Queue\CommandQueueInterface;
@@ -29,26 +30,37 @@ class Importer implements ImporterInterface
         do {
             $command = $queue->dequeue();
 
-            if (null === $command) {
-                break;
-            }
+//            try {
 
-            try {
+                if (null === $command) {
 
-                $this->commandBus->dispatch($command);
+                    $this->commandBus->tearDown();
+                    $command = $queue->dequeue();
 
-            } catch (RecoverableCommandHandlerException $e) {
+                    if (null === $command) {
+                        break;
+                    }
+                }
 
-                $this->publishFailedCommands($queue, $e->getCommands());
+                $promise = new CommandPromise($command, function () use ($queue, $command) {
 
-            } catch (CommandHandlerException $e) {
+                    $this->publishFailedCommands($queue, [$command]);
 
-                // do nothing
-            }
+                });
 
-        } while ($command !== null);
+                $this->commandBus->dispatch($promise);
 
-        $this->commandBus->tearDown();
+//            } catch (RecoverableCommandHandlerException $e) {
+//
+//                $this->publishFailedCommands($queue, $e->getCommands());
+//
+//            } catch (CommandHandlerException $e) {
+//
+//                // do nothing
+//
+//            }
+
+        } while (true); // exit only when queue is empty
     }
 
     private function publishFailedCommands(CommandQueueInterface $queue, iterable $commands): void

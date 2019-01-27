@@ -3,6 +3,8 @@
 namespace spec\Aa\AkeneoImport\Import;
 
 use Aa\AkeneoImport\CommandBus\CommandBus;
+use Aa\AkeneoImport\CommandBus\CommandPromise;
+use Aa\AkeneoImport\ImportCommand\AsyncCommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
 use Aa\AkeneoImport\ImportCommand\Exception\RecoverableCommandHandlerException;
@@ -23,8 +25,7 @@ class ImporterSpec extends ObjectBehavior
         $command2 = new Command(2);
 
         $commandBus->setUp()->shouldBeCalled();
-        $commandBus->dispatch($command1)->shouldBeCalled();
-        $commandBus->dispatch($command2)->shouldBeCalled();
+        $commandBus->dispatch(Argument::type(CommandPromise::class))->shouldBeCalledTimes(2);
         $commandBus->tearDown()->shouldBeCalled();
 
         $this->import([$command1, $command2]);
@@ -38,19 +39,20 @@ class ImporterSpec extends ObjectBehavior
         $queue->dequeue()->willReturn($command1, $command2, null);
 
         $commandBus->setUp()->shouldBeCalled();
-        $commandBus->dispatch($command1)->shouldBeCalled();
-        $commandBus->dispatch($command2)->shouldBeCalled();
+        $commandBus->dispatch(Argument::type(CommandPromise::class))->shouldBeCalledTimes(2);
         $commandBus->tearDown()->shouldBeCalled();
 
         $this->import([$command1, $command2]);
     }
 
-
-    function it_republishes_failed_recoverable_commands(CommandBus $commandBus)
+    function it_republishes_failed_recoverable_commands(CommandBus $commandBus, AsyncCommandHandlerInterface $handler)
     {
         $command1 = new Command(1);
         $command2 = new Command(2);
         $command3 = new Command(3);
+
+//        $commandBus->beConstructedWith([[$handler]]);
+//        $handler->handle()->will()
 
         $commandBus->setUp()->shouldBeCalled();
         $commandBus->tearDown()->shouldBeCalled();
@@ -99,4 +101,12 @@ class Command implements CommandInterface
         $this->id = $id;
     }
 };
+
+class TestCommandPromise extends CommandPromise
+{
+    public function __construct(int $id)
+    {
+        parent::__construct(new Command($id), function() {});
+    }
+}
 

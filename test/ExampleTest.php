@@ -31,7 +31,7 @@ class ExampleTest extends TestCase
         $this->importer = $factory->createByApiClient($this->client, 3);
     }
 
-    public function test_import_product_builder()
+    public function _test_import_product_builder()
     {
         $commandBuilder = new ImportCommand\Product\ProductCommandBuilder('1');
         $commandBuilder
@@ -68,10 +68,10 @@ class ExampleTest extends TestCase
         $this->assertArraysAreEqual($requestLog, $expected);
     }
 
-    public function test_import_products_in_batch()
+    public function _test_import_products_in_batch()
     {
         for ($i = 1; $i <= 10; $i++) {
-            $commands[] = new ImportCommand\Product\SetEnabled($i, true);
+            $commands[] = new ImportCommand\Product\Create($i);
         }
 
         $this->importer->import($commands);
@@ -104,6 +104,22 @@ class ExampleTest extends TestCase
         $requestLog = $this->client->getRequestLog();
 
         $this->assertArraysAreEqual($requestLog, $expected);
+    }
+
+    public function test_that_products_are_republished()
+    {
+        $commands = [
+            new ImportCommand\Product\Create('1'),
+            new ImportCommand\Product\Create('2'),
+        ];
+
+        $this->client->getProductApi()->addUpsertResponse('identifier', 1, 422, '', 1);
+
+        $this->importer->import($commands);
+
+        $requestLog = $this->client->getRequestLog();
+
+        var_dump($requestLog);
     }
 
     private function assertArraysAreEqual(array $actual, array $expected): void

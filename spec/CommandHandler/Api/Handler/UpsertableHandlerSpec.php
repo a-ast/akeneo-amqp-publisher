@@ -2,12 +2,7 @@
 
 namespace spec\Aa\AkeneoImport\CommandHandler\Api\Handler;
 
-use Aa\AkeneoImport\CommandHandler\Api\Handler\CommandAccumulator;
-use Aa\AkeneoImport\CommandHandler\Api\Handler\UpsertableHandler;
-use Aa\AkeneoImport\ImportCommand\CommandInterface;
-use Aa\AkeneoImport\ImportCommand\Control\FinishImport;
-use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
-use Aa\AkeneoImport\ImportCommand\Product\ProductFieldInterface;
+use Aa\AkeneoImport\CommandBus\CommandPromise;
 use Akeneo\Pim\ApiClient\Api\Operation\UpsertableResourceListInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -29,16 +24,12 @@ class UpsertableHandlerSpec extends ObjectBehavior
         $this->beConstructedWith($api, 'identifier', $normalizer, 2);
     }
 
-    function it_is_initializable()
-    {
-        $this->shouldHaveType(UpsertableHandler::class);
-    }
 
     function it_handles_one_command(UpsertableResourceListInterface $api)
     {
         $api->upsertList(Argument::type('array'))->shouldBeCalled()->willReturn([]);
 
-        $this->handle(new TestCommand('1'));
+        $this->handle(new CommandPromise(new TestCommand('1'), function() {}));
         $this->tearDown();
     }
 
@@ -46,11 +37,11 @@ class UpsertableHandlerSpec extends ObjectBehavior
     {
         $api->upsertList(Argument::type('array'))->shouldBeCalledTimes(3)->willReturn([]);
 
-        $this->handle(new TestCommand('1'));
-        $this->handle(new TestCommand('2'));
-        $this->handle(new TestCommand('3'));
-        $this->handle(new TestCommand('4'));
-        $this->handle(new TestCommand('5'));
+        $this->handle(new CommandPromise(new TestCommand('1'), function() {}));
+        $this->handle(new CommandPromise(new TestCommand('2'), function() {}));
+        $this->handle(new CommandPromise(new TestCommand('3'), function() {}));
+        $this->handle(new CommandPromise(new TestCommand('4'), function() {}));
+        $this->handle(new CommandPromise(new TestCommand('5'), function() {}));
         $this->tearDown();
     }
 }

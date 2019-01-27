@@ -3,6 +3,7 @@
 namespace Aa\AkeneoImport\Import;
 
 use Aa\AkeneoImport\CommandBus\CommandBus;
+use Aa\AkeneoImport\CommandHandler\Api\Handler\UpsertableHandler;
 use Aa\AkeneoImport\CommandHandler\Api\Handler\DeleteHandler;
 use Aa\AkeneoImport\CommandHandler\Api\Handler\MediaHandler;
 use Aa\AkeneoImport\CommandHandler\Api\Handler\UpsertableHandler;
@@ -30,7 +31,7 @@ class ApiImporterFactory
         $propertyReplacementMap = [
             'product_identifier' => 'identifier',
             'product_model_code' => 'code',
-            'categoryCode' => 'code',
+            'category_code' => 'code',
         ];
 
         $normalizer = $this->createSerializer($propertyReplacementMap);
@@ -45,7 +46,8 @@ class ApiImporterFactory
         $upsertableProductModelHandler = new UpsertableHandler(
             $client->getProductModelApi(),
             'code',
-            $normalizer
+            $normalizer,
+            $upsertBatchSize
         );
 
         $handlers = [
