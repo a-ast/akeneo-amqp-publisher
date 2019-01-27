@@ -80,8 +80,13 @@ class RemoteQueue implements CommandQueueInterface
         $command = $this->serializer->deserialize($body, $commandClass, 'json');
 
         if (!$command instanceof CommandInterface) {
+
+            // @todo: reject message ?
+
             throw new \Exception(sprintf('Impossible to deserialize a command from %s', substr($body, 1, 1000)));
         }
+
+        $this->consumer->acknowledge($message);
 
         return $command;
     }
