@@ -6,7 +6,7 @@ use Aa\AkeneoImport\CommandBus\CommandPromise;
 use Akeneo\Pim\ApiClient\Api\Operation\UpsertableResourceListInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-use spec\Aa\AkeneoImport\CommandHandler\Api\Handler\fixture\TestCommand;
+use spec\Aa\AkeneoImport\fixture\TestCommand;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class UpsertableHandlerSpec extends ObjectBehavior

@@ -1,6 +1,6 @@
 <?php
 
-namespace spec\Aa\AkeneoImport\CommandHandler\Api\Handler\fixture;
+namespace spec\Aa\AkeneoImport\fixture;
 
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Product\ProductFieldInterface;

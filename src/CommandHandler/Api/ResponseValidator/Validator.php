@@ -4,9 +4,8 @@ namespace Aa\AkeneoImport\CommandHandler\Api\ResponseValidator;
 
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\Exception\TolerantValidationException;
 use Aa\AkeneoImport\CommandHandler\Api\ResponseValidator\Exception\ValidationException;
-use Akeneo\Pim\ApiClient\Api\Operation\UpsertableResourceListInterface;
 
-class Validator implements ValidatorInterface
+class Validator
 {
     const UNPROCESSABLE_ENTITY = 422;
     const BAD_REQUEST = 400;
@@ -21,7 +20,7 @@ class Validator implements ValidatorInterface
         // Check recoverable cases first
         foreach ($responses as $response) {
             if ($this->isRecoverable($response)) {
-                $entityCodes[] = $response->getEntityCode();
+                // $entityCodes[] = $response->getEntityCode();
             };
         }
 

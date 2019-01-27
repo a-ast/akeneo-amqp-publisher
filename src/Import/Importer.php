@@ -44,7 +44,7 @@ class Importer implements ImporterInterface
 
                 $promise = new CommandPromise($command, function () use ($queue, $command) {
 
-                    $this->publishFailedCommands($queue, [$command]);
+                    $queue->enqueue($command);
 
                 });
 
