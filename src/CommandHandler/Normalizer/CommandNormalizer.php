@@ -3,6 +3,7 @@
 namespace Aa\AkeneoImport\CommandHandler\Normalizer;
 
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
+use LogicException;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -25,13 +26,17 @@ class CommandNormalizer implements NormalizerInterface, NormalizerAwareInterface
     {
         $data = $this->normalizer->normalize($object, null, $context);
 
+        if (!is_array($data)) {
+            throw new LogicException('Normalizer must return array.');
+        }
+
         foreach ($this->propertyNameReplaceMap as $replacingProperty => $property) {
 
             if (!isset($data[$replacingProperty])) {
                 continue;
             }
 
-            $data[$property] = $data[$replacingProperty];
+            $data = array_merge([$property => $data[$replacingProperty]], $data);
             unset($data[$replacingProperty]);
 
             break;
