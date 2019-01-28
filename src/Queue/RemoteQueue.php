@@ -55,7 +55,7 @@ class RemoteQueue implements CommandQueueInterface
         $body = $this->serializer->serialize($command, 'json');
 
         $headers = [
-            'class' => get_class($command),
+            'type' => get_class($command),
         ];
 
         $message = $this->context->createMessage($body, [], $headers);
@@ -76,7 +76,7 @@ class RemoteQueue implements CommandQueueInterface
 
         $body = $message->getBody();
 
-        $commandClass = $message->getHeader('class');
+        $commandClass = $message->getHeader('type');
         $command = $this->serializer->deserialize($body, $commandClass, 'json');
 
         if (!$command instanceof CommandInterface) {

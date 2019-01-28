@@ -23,59 +23,36 @@ class Importer implements ImporterInterface
 
     public function import(iterable $commands)
     {
-        $queue = $this->getQueue($commands);
+        $queue = new InMemoryQueue($commands);
 
+        $this->importQueue($queue);
+    }
+
+    public function importQueue(CommandQueueInterface $queue)
+    {
         $this->commandBus->setUp();
 
         do {
             $command = $queue->dequeue();
 
-//            try {
+            if (null === $command) {
+
+                $this->commandBus->tearDown();
+                $command = $queue->dequeue();
 
                 if (null === $command) {
-
-                    $this->commandBus->tearDown();
-                    $command = $queue->dequeue();
-
-                    if (null === $command) {
-                        break;
-                    }
+                    break;
                 }
+            }
 
-                $promise = new CommandPromise($command, function () use ($queue, $command) {
+            $promise = new CommandPromise($command, function () use ($queue, $command) {
 
-                    $queue->enqueue($command);
+                $queue->enqueue($command);
 
-                });
+            });
 
-                $this->commandBus->dispatch($promise);
-
-//            } catch (RecoverableCommandHandlerException $e) {
-//
-//                $this->publishFailedCommands($queue, $e->getCommands());
-//
-//            } catch (CommandHandlerException $e) {
-//
-//                // do nothing
-//
-//            }
+            $this->commandBus->dispatch($promise);
 
         } while (true); // exit only when queue is empty
-    }
-
-    private function publishFailedCommands(CommandQueueInterface $queue, iterable $commands): void
-    {
-        foreach ($commands as $failedCommand) {
-            $queue->enqueue($failedCommand);
-        }
-    }
-
-    private function getQueue(iterable $commands): CommandQueueInterface
-    {
-        if (!$commands instanceof CommandQueueInterface) {
-            return new InMemoryQueue($commands);
-        }
-
-        return $commands;
     }
 }
