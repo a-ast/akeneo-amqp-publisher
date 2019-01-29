@@ -2,7 +2,7 @@
 
 namespace Aa\AkeneoImport\CommandBus;
 
-use Aa\AkeneoImport\ImportCommand\AsyncCommandHandlerInterface;
+use Aa\AkeneoImport\ImportCommand\CommandCallbacks;
 use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
@@ -20,16 +20,11 @@ class CommandBus
         $this->handlers = $handlers;
     }
 
-    public function dispatch(CommandPromise $commandPromise)
+    public function dispatch(CommandInterface $command, CommandCallbacks $callbacks = null)
     {
-        $handler = $this->findHandlerFor($commandPromise->getCommand());
+        $handler = $this->findHandlerFor($command);
 
-        if ($handler instanceof AsyncCommandHandlerInterface) {
-            return $handler->handle($commandPromise);
-        }
-
-
-        return $handler->handle($commandPromise->getCommand());
+        return $handler->handle($command, $callbacks);
     }
 
     private function getCommandTypes(CommandInterface $command): array
@@ -57,7 +52,7 @@ class CommandBus
         }
     }
 
-    private function findHandlerFor(CommandInterface $command) //: CommandHandlerInterface
+    private function findHandlerFor(CommandInterface $command): CommandHandlerInterface
     {
         $commandTypes = $this->getCommandTypes($command);
         $availableTypes = array_keys($this->handlers);

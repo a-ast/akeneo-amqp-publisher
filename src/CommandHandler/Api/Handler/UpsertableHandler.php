@@ -3,15 +3,15 @@
 namespace Aa\AkeneoImport\CommandHandler\Api\Handler;
 
 use Aa\AkeneoImport\CommandBus\CommandPromise;
-use Aa\AkeneoImport\ImportCommand\AsyncCommandHandlerInterface;
+use Aa\AkeneoImport\ImportCommand\CommandCallbacks;
+use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
-use Aa\AkeneoImport\ImportCommand\Exception\RecoverableCommandHandlerException;
 use Aa\AkeneoImport\ImportCommand\InitializableCommandHandlerInterface;
 use Akeneo\Pim\ApiClient\Api\Operation\UpsertableResourceListInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class UpsertableHandler implements AsyncCommandHandlerInterface, InitializableCommandHandlerInterface
+class UpsertableHandler implements CommandHandlerInterface, InitializableCommandHandlerInterface
 {
     /**
      * @var UpsertableResourceListInterface
@@ -34,14 +34,19 @@ class UpsertableHandler implements AsyncCommandHandlerInterface, InitializableCo
     private $commandUniqueProperty;
 
     /**
-     * @var array|CommandPromise[]
-     */
-    private $promises;
-
-    /**
-     * @var \Symfony\Component\Serializer\Normalizer\NormalizerInterface
+     * @var NormalizerInterface
      */
     private $normalizer;
+
+    /**
+     * @var array|CommandInterface[]
+     */
+    private $commands;
+
+    /**
+     * @var array|CommandCallbacks[]|null[]
+     */
+    private $commandCallbacks;
 
     public function __construct(UpsertableResourceListInterface $api, string $commandUniqueProperty,
         NormalizerInterface $normalizer, int $batchSize = 100)
@@ -53,9 +58,9 @@ class UpsertableHandler implements AsyncCommandHandlerInterface, InitializableCo
         $this->normalizer = $normalizer;
     }
 
-    public function handle(CommandPromise $command)
+    public function handle(CommandInterface $command, CommandCallbacks $callbacks = null)
     {
-        $commandData = $this->getNormalizedData($command->getCommand());
+        $commandData = $this->getNormalizedData($command);
         $commandCode = $commandData[$this->commandUniqueProperty];
 
         if ($this->accumulator->getCountAfterAdding($commandCode) > $this->batchSize) {
@@ -63,7 +68,8 @@ class UpsertableHandler implements AsyncCommandHandlerInterface, InitializableCo
         }
 
         $this->accumulator->add($commandCode, $commandData);
-        $this->promises[$commandCode] = $command;
+        $this->commands[$commandCode] = $command;
+        $this->commandCallbacks[$commandCode] = $callbacks;
     }
 
     private function sendCommands()
@@ -90,14 +96,21 @@ class UpsertableHandler implements AsyncCommandHandlerInterface, InitializableCo
 
                 $code = $upsertedResource[$this->commandUniqueProperty];
 
-                $this->promises[$code]->repeat();
+                $callBacks = $this->commandCallbacks[$code];
+
+                if (null === $callBacks) {
+                    continue;
+                }
+
+                $command = $this->commands[$code];
+                $callBacks->repeat($command);
 
 //                throw new RecoverableCommandHandlerException($upsertedResource['message'], 0, [$this->accumulator->getCommand($upsertedResource[$this->commandUniqueProperty])]);
             }
         }
 
         $this->accumulator->clear();
-        $this->promises = [];
+        $this->commands = [];
     }
 
     public function setUp()

@@ -17,9 +17,6 @@ class CommandBusSpec extends ObjectBehavior
         $command1 = new class implements CommandInterface {};
         $command2 = new class implements CommandInterface {};
 
-        $command1Promise = new CommandPromise($command1, function() {});
-        $command2Promise = new CommandPromise($command2, function() {});
-
         $handlers = [
             get_class($command1) => $handler1,
             get_class($command2) => $handler2,
@@ -27,17 +24,16 @@ class CommandBusSpec extends ObjectBehavior
 
         $this->beConstructedWith($handlers);
 
-        $handler1->handle($command1)->shouldBeCalled();
-        $handler2->handle($command2)->shouldBeCalled();
+        $handler1->handle($command1, null)->shouldBeCalled();
+        $handler2->handle($command2, null)->shouldBeCalled();
 
-        $this->dispatch($command1Promise);
-        $this->dispatch($command2Promise);
+        $this->dispatch($command1);
+        $this->dispatch($command2);
     }
 
     function it_redirects_commands_to_handlers_by_interface(CommandHandlerInterface $handler)
     {
         $command = new class implements CommandInterface, CommonCommandInterface {};
-        $commandPromise = new CommandPromise($command, function() {});
 
         $handlers = [
             CommonCommandInterface::class => $handler,
@@ -45,9 +41,9 @@ class CommandBusSpec extends ObjectBehavior
 
         $this->beConstructedWith($handlers);
 
-        $handler->handle($command)->shouldBeCalled();
+        $handler->handle($command, null)->shouldBeCalled();
 
-        $this->dispatch($commandPromise);
+        $this->dispatch($command);
     }
 
     function it_initializes_handlers_that_support_it(CommandHandlerInterface $handler)
@@ -87,7 +83,6 @@ class CommandBusSpec extends ObjectBehavior
     function it_throws_an_exception_if_handler_not_found(CommandHandlerInterface $handler)
     {
         $command = new class implements CommandInterface {};
-        $commandPromise = new CommandPromise($command, function() {});
 
         $handlers = [
             UnknownCommandInterface::class => $handler,
@@ -95,7 +90,7 @@ class CommandBusSpec extends ObjectBehavior
 
         $this->beConstructedWith($handlers);
 
-        $this->shouldThrow(CommandHandlerException::class)->during('dispatch', [$commandPromise]);
+        $this->shouldThrow(CommandHandlerException::class)->during('dispatch', [$command]);
     }
 }
 

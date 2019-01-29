@@ -29,7 +29,7 @@ class UpsertableHandlerSpec extends ObjectBehavior
     {
         $api->upsertList(Argument::type('array'))->shouldBeCalled()->willReturn([]);
 
-        $this->handle(new CommandPromise(new TestCommand('1'), function() {}));
+        $this->handle(new TestCommand('1'));
         $this->tearDown();
     }
 
@@ -37,11 +37,11 @@ class UpsertableHandlerSpec extends ObjectBehavior
     {
         $api->upsertList(Argument::type('array'))->shouldBeCalledTimes(3)->willReturn([]);
 
-        $this->handle(new CommandPromise(new TestCommand('1'), function() {}));
-        $this->handle(new CommandPromise(new TestCommand('2'), function() {}));
-        $this->handle(new CommandPromise(new TestCommand('3'), function() {}));
-        $this->handle(new CommandPromise(new TestCommand('4'), function() {}));
-        $this->handle(new CommandPromise(new TestCommand('5'), function() {}));
+        $this->handle(new TestCommand('1'));
+        $this->handle(new TestCommand('2'));
+        $this->handle(new TestCommand('3'));
+        $this->handle(new TestCommand('4'));
+        $this->handle(new TestCommand('5'));
         $this->tearDown();
     }
 }

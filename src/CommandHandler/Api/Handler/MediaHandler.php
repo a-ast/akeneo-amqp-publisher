@@ -2,6 +2,7 @@
 
 namespace Aa\AkeneoImport\CommandHandler\Api\Handler;
 
+use Aa\AkeneoImport\ImportCommand\CommandCallbacks;
 use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
@@ -21,7 +22,7 @@ class MediaHandler implements CommandHandlerInterface
         $this->api = $api;
     }
 
-    public function handle(CommandInterface $command)
+    public function handle(CommandInterface $command, CommandCallbacks $callbacks = null)
     {
         if (!$command instanceof CreateProductMediaFile && !$command instanceof CreateProductModelMediaFile) {
             return;

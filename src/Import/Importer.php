@@ -3,9 +3,8 @@
 namespace Aa\AkeneoImport\Import;
 
 use Aa\AkeneoImport\CommandBus\CommandBus;
-use Aa\AkeneoImport\CommandBus\CommandPromise;
-use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
-use Aa\AkeneoImport\ImportCommand\Exception\RecoverableCommandHandlerException;
+use Aa\AkeneoImport\ImportCommand\CommandCallbacks;
+use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\Queue\CommandQueueInterface;
 use Aa\AkeneoImport\Queue\InMemoryQueue;
 
@@ -32,6 +31,12 @@ class Importer implements ImporterInterface
     {
         $this->commandBus->setUp();
 
+        $callbacks = new CommandCallbacks(function (CommandInterface $command) use ($queue) {
+
+            $queue->enqueue($command);
+
+        });
+
         do {
             $command = $queue->dequeue();
 
@@ -45,13 +50,7 @@ class Importer implements ImporterInterface
                 }
             }
 
-            $promise = new CommandPromise($command, function () use ($queue, $command) {
-
-                $queue->enqueue($command);
-
-            });
-
-            $this->commandBus->dispatch($promise);
+            $this->commandBus->dispatch($command, $callbacks);
 
         } while (true); // exit only when queue is empty
     }

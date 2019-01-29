@@ -3,11 +3,7 @@
 namespace spec\Aa\AkeneoImport\Import;
 
 use Aa\AkeneoImport\CommandBus\CommandBus;
-use Aa\AkeneoImport\CommandBus\CommandPromise;
-use Aa\AkeneoImport\ImportCommand\AsyncCommandHandlerInterface;
-use Aa\AkeneoImport\ImportCommand\CommandInterface;
-use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
-use Aa\AkeneoImport\ImportCommand\Exception\RecoverableCommandHandlerException;
+use Aa\AkeneoImport\ImportCommand\CommandCallbacks;
 use Aa\AkeneoImport\Queue\CommandQueueInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -26,7 +22,7 @@ class ImporterSpec extends ObjectBehavior
         $command2 = new TestCommand('2');
 
         $commandBus->setUp()->shouldBeCalled();
-        $commandBus->dispatch(Argument::type(CommandPromise::class))->shouldBeCalledTimes(2);
+        $commandBus->dispatch(Argument::type(TestCommand::class), Argument::type(CommandCallbacks::class))->shouldBeCalledTimes(2);
         $commandBus->tearDown()->shouldBeCalled();
 
         $this->import([$command1, $command2]);
@@ -40,7 +36,7 @@ class ImporterSpec extends ObjectBehavior
         $queue->dequeue()->willReturn($command1, $command2, null);
 
         $commandBus->setUp()->shouldBeCalled();
-        $commandBus->dispatch(Argument::type(CommandPromise::class))->shouldBeCalledTimes(2);
+        $commandBus->dispatch(Argument::type(TestCommand::class), Argument::type(CommandCallbacks::class))->shouldBeCalledTimes(2);
         $commandBus->tearDown()->shouldBeCalled();
 
         $this->import([$command1, $command2]);

@@ -21,7 +21,7 @@ using message brokers like RabbitMQ.
 
 ## Installation
 ```
-composer require a-ast/akeneo-import
+composer require aa/akeneo-import
 ```
 
 ## Examples
