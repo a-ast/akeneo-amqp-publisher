@@ -6,7 +6,7 @@ use Aa\AkeneoImport\ImportCommand\CommandCallbacks;
 use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
-use Aa\AkeneoImport\ImportCommand\Product\DeleteProduct;
+use Aa\AkeneoImport\ImportCommand\Product\Delete;
 use Akeneo\Pim\ApiClient\Api\Operation\DeletableResourceInterface;
 
 class DeleteHandler implements CommandHandlerInterface
@@ -28,7 +28,7 @@ class DeleteHandler implements CommandHandlerInterface
 
     private function getEntityUniqueCode(CommandInterface $command)
     {
-        if ($command instanceof DeleteProduct) {
+        if ($command instanceof Delete) {
             return $command->getIdentifier();
         }
 

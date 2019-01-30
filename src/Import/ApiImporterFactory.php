@@ -10,7 +10,7 @@ use Aa\AkeneoImport\CommandHandler\Api\Handler\MediaHandler;
 use Aa\AkeneoImport\CommandHandler\Normalizer\CommandNormalizer;
 use Aa\AkeneoImport\ImportCommand\Media\CreateProductMediaFile;
 use Aa\AkeneoImport\ImportCommand\Media\CreateProductModelMediaFile;
-use Aa\AkeneoImport\ImportCommand\Product\DeleteProduct;
+use Aa\AkeneoImport\ImportCommand\Product\Delete;
 use Aa\AkeneoImport\ImportCommand\Product\ProductFieldInterface;
 use Aa\AkeneoImport\ImportCommand\ProductModel\ProductModelFieldInterface;
 use Akeneo\Pim\ApiClient\AkeneoPimClientBuilder;
@@ -58,7 +58,7 @@ class ApiImporterFactory
             CreateProductModelMediaFile::class => new MediaHandler($client->getProductMediaFileApi()),
             ProductModelFieldInterface::class => $upsertableProductModelHandler,
             ProductFieldInterface::class => $upsertableProductHandler,
-            DeleteProduct::class => new DeleteHandler($client->getProductApi()),
+            Delete::class => new DeleteHandler($client->getProductApi()),
         ];
 
         return new Importer(new CommandBus($handlers));
