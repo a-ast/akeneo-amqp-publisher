@@ -12,6 +12,10 @@ class ResponseHandler
     const CREATED = 201;
     const NO_CONTENT = 204;
 
+    const MESSAGES = [
+        '/^Property "parent" expects a valid parent code\.$/',
+        '/^Product model "(.*)" does not exist\.$/',
+    ];
 
     public function handle(CommandInterface $command, int $responseCode, string $message, CommandCallbacks $callbacks = null, array $errors = [])
     {
@@ -31,8 +35,20 @@ class ResponseHandler
     private function isRecoverable(int $responseCode, string $message): bool
     {
         return (self::UNPROCESSABLE_ENTITY === $responseCode &&
-            false !== strpos($message, 'Property "parent" expects a valid parent code.'));
+            $this->isMessageOfRecoverableCommand($message));
     }
+
+    private function isMessageOfRecoverableCommand(string $message): bool
+    {
+        foreach (self::MESSAGES as $messageExpression) {
+            if (1 === preg_match($messageExpression, $message)) {
+                return true;
+            }
+
+            return false;
+        }
+    }
+
 
     private function isSuccess(int $responseCode)
     {

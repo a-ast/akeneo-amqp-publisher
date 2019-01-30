@@ -54,8 +54,8 @@ class ApiImporterFactory
         );
 
         $handlers = [
-            CreateProductMediaFile::class => new MediaHandler($client->getProductMediaFileApi()),
-            CreateProductModelMediaFile::class => new MediaHandler($client->getProductMediaFileApi()),
+            CreateProductMediaFile::class => new MediaHandler($client->getProductMediaFileApi(), $responseHandler),
+            CreateProductModelMediaFile::class => new MediaHandler($client->getProductMediaFileApi(), $responseHandler),
             ProductModelFieldInterface::class => $upsertableProductModelHandler,
             ProductFieldInterface::class => $upsertableProductHandler,
             Delete::class => new DeleteHandler($client->getProductApi()),

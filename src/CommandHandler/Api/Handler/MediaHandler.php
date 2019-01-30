@@ -2,6 +2,7 @@
 
 namespace Aa\AkeneoImport\CommandHandler\Api\Handler;
 
+use Aa\AkeneoImport\CommandHandler\Api\ResponseHandler;
 use Aa\AkeneoImport\ImportCommand\CommandCallbacks;
 use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
@@ -9,6 +10,7 @@ use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
 use Aa\AkeneoImport\ImportCommand\Media\CreateProductMediaFile;
 use Aa\AkeneoImport\ImportCommand\Media\CreateProductModelMediaFile;
 use Akeneo\Pim\ApiClient\Api\MediaFileApiInterface;
+use Akeneo\Pim\ApiClient\Exception\UnprocessableEntityHttpException;
 
 class MediaHandler implements CommandHandlerInterface
 {
@@ -17,9 +19,15 @@ class MediaHandler implements CommandHandlerInterface
      */
     private $api;
 
-    public function __construct(MediaFileApiInterface $api)
+    /**
+     * @var \Aa\AkeneoImport\CommandHandler\Api\ResponseHandler
+     */
+    private $responseHandler;
+
+    public function __construct(MediaFileApiInterface $api, ResponseHandler $responseHandler)
     {
         $this->api = $api;
+        $this->responseHandler = $responseHandler;
     }
 
     public function handle(CommandInterface $command, CommandCallbacks $callbacks = null)
@@ -29,7 +37,15 @@ class MediaHandler implements CommandHandlerInterface
         }
 
         $meta = $this->getCommandMetadata($command);
-        $this->api->create($command->getFileName(), $meta);
+        try {
+
+            $this->api->create($command->getFileName(), $meta);
+
+        } catch (UnprocessableEntityHttpException $e) {
+
+            $this->responseHandler->handle($command, $e->getCode(), $e->getMessage(), $callbacks);
+
+        }
     }
 
     private function getCommandMetadata(CommandInterface $command): array
