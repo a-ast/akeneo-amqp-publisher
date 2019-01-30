@@ -2,7 +2,6 @@
 
 namespace Aa\AkeneoImport\CommandHandler\Api\Handler;
 
-use Aa\AkeneoImport\CommandBus\CommandPromise;
 use Aa\AkeneoImport\ImportCommand\CommandCallbacks;
 use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
@@ -48,14 +47,20 @@ class UpsertableHandler implements CommandHandlerInterface, InitializableCommand
      */
     private $commandCallbacks;
 
+    /**
+     * @var ResponseHandler
+     */
+    private $responseHandler;
+
     public function __construct(UpsertableResourceListInterface $api, string $commandUniqueProperty,
-        NormalizerInterface $normalizer, int $batchSize = 100)
+        NormalizerInterface $normalizer, ResponseHandler $responseHandler, int $batchSize = 100)
     {
         $this->api = $api;
         $this->accumulator = new CommandAccumulator();
         $this->batchSize = $batchSize;
         $this->commandUniqueProperty = $commandUniqueProperty;
         $this->normalizer = $normalizer;
+        $this->responseHandler = $responseHandler;
     }
 
     public function handle(CommandInterface $command, CommandCallbacks $callbacks = null)
@@ -68,6 +73,8 @@ class UpsertableHandler implements CommandHandlerInterface, InitializableCommand
         }
 
         $this->accumulator->add($commandCode, $commandData);
+
+        // @todo: save command only if callback set (or do I need a command for other exceptions)
         $this->commands[$commandCode] = $command;
         $this->commandCallbacks[$commandCode] = $callbacks;
     }
@@ -82,31 +89,15 @@ class UpsertableHandler implements CommandHandlerInterface, InitializableCommand
 
         $upsertedResources = $this->api->upsertList($commandData);
 
-        // @todo: checks 4XX and that it doesn't clear batches
-
-
-
         foreach ($upsertedResources as $upsertedResource) {
 
-            // gather all failed command codes and return them back with an exception
+            $code = $upsertedResource[$this->commandUniqueProperty];
 
-            // take $codePropertyName
+            $command = $this->commands[$code];
+            $callBacks = $this->commandCallbacks[$code] ?? null;
 
-            if (422 === $upsertedResource['status_code']) {
-
-                $code = $upsertedResource[$this->commandUniqueProperty];
-
-                $callBacks = $this->commandCallbacks[$code];
-
-                if (null === $callBacks) {
-                    continue;
-                }
-
-                $command = $this->commands[$code];
-                $callBacks->repeat($command);
-
-//                throw new RecoverableCommandHandlerException($upsertedResource['message'], 0, [$this->accumulator->getCommand($upsertedResource[$this->commandUniqueProperty])]);
-            }
+            $this->responseHandler->handle($command, $callBacks, $upsertedResource['status_code'],
+                $upsertedResource['message'], $upsertedResource['errors'] ?? []);
         }
 
         $this->accumulator->clear();
@@ -130,7 +121,7 @@ class UpsertableHandler implements CommandHandlerInterface, InitializableCommand
         $data = $this->normalizer->normalize($command, 'standard');
 
         if (false === is_array($data)) {
-            throw new CommandHandlerException('Normalizer must returmn array');
+            throw new CommandHandlerException('Normalizer must return array', $command);
         }
 
         return $data;

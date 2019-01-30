@@ -62,7 +62,7 @@ class CommandBus
         $firstSupportedType = array_shift($supportedTypes);
 
         if (null === $firstSupportedType) {
-            throw new CommandHandlerException(sprintf('No handler found for the command %s', get_class($command)));
+            throw new CommandHandlerException(sprintf('No handler found for the command %s', get_class($command)), $command);
         }
 
         return $this->handlers[$firstSupportedType];

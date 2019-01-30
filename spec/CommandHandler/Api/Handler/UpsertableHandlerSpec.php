@@ -3,6 +3,8 @@
 namespace spec\Aa\AkeneoImport\CommandHandler\Api\Handler;
 
 use Aa\AkeneoImport\CommandBus\CommandPromise;
+use Aa\AkeneoImport\CommandHandler\Api\Handler\ResponseHandler;
+use Aa\AkeneoImport\ImportCommand\CommandCallbacks;
 use Akeneo\Pim\ApiClient\Api\Operation\UpsertableResourceListInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -11,7 +13,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class UpsertableHandlerSpec extends ObjectBehavior
 {
-    function let(UpsertableResourceListInterface $api, NormalizerInterface $normalizer)
+    function let(UpsertableResourceListInterface $api, NormalizerInterface $normalizer, ResponseHandler $responseHandler)
     {
         $normalizer
             ->normalize(Argument::type(TestCommand::class), Argument::any(), Argument::any())
@@ -21,7 +23,7 @@ class UpsertableHandlerSpec extends ObjectBehavior
                 return array_merge(['identifier' => $command->getProductIdentifier()], $command->getAttributes());
             });
 
-        $this->beConstructedWith($api, 'identifier', $normalizer, 2);
+        $this->beConstructedWith($api, 'identifier', $normalizer, $responseHandler, 2);
     }
 
 
@@ -43,5 +45,19 @@ class UpsertableHandlerSpec extends ObjectBehavior
         $this->handle(new TestCommand('4'));
         $this->handle(new TestCommand('5'));
         $this->tearDown();
+    }
+
+    function it_checks_upsert_response(UpsertableResourceListInterface $api, ResponseHandler $responseHandler, CommandCallbacks $callbacks)
+    {
+        $upsertResponse = [
+            ['identifier' => 1, 'message' => 'Ok', 'status_code' => 200],
+        ];
+        $api->upsertList(Argument::type('array'))->willReturn($upsertResponse);
+
+        $command = new TestCommand('1');
+        $this->handle($command, $callbacks);
+        $this->tearDown();
+
+        $responseHandler->handle($command, $callbacks, 200, 'Ok', [])->shouldBeCalled();
     }
 }

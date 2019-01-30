@@ -3,6 +3,7 @@
 namespace Aa\AkeneoImport\Import;
 
 use Aa\AkeneoImport\CommandBus\CommandBus;
+use Aa\AkeneoImport\CommandHandler\Api\Handler\ResponseHandler;
 use Aa\AkeneoImport\CommandHandler\Api\Handler\UpsertableHandler;
 use Aa\AkeneoImport\CommandHandler\Api\Handler\DeleteHandler;
 use Aa\AkeneoImport\CommandHandler\Api\Handler\MediaHandler;
@@ -32,12 +33,15 @@ class ApiImporterFactory
             'category_code' => 'code',
         ];
 
+        $responseHandler = new ResponseHandler();
+
         $normalizer = $this->createSerializer($propertyReplacementMap);
 
         $upsertableProductHandler = new UpsertableHandler(
             $client->getProductApi(),
             'identifier',
             $normalizer,
+            $responseHandler,
             $upsertBatchSize
         );
 
@@ -45,6 +49,7 @@ class ApiImporterFactory
             $client->getProductModelApi(),
             'code',
             $normalizer,
+            $responseHandler,
             $upsertBatchSize
         );
 
