@@ -49,11 +49,11 @@ class ApiImporterFactory
         );
 
         $handlers = [
-            DeleteProduct::class => new DeleteHandler($client->getProductApi()),
             CreateProductMediaFile::class => new MediaHandler($client->getProductMediaFileApi()),
             CreateProductModelMediaFile::class => new MediaHandler($client->getProductMediaFileApi()),
-            ProductFieldInterface::class => $upsertableProductHandler,
             ProductModelFieldInterface::class => $upsertableProductModelHandler,
+            ProductFieldInterface::class => $upsertableProductHandler,
+            DeleteProduct::class => new DeleteHandler($client->getProductApi()),
         ];
 
         return new Importer(new CommandBus($handlers));
