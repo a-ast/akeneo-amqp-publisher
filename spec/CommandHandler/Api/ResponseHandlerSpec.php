@@ -17,6 +17,13 @@ class ResponseHandlerSpec extends ObjectBehavior
         $callbacks->repeat($command)->shouldBeCalled();
     }
 
+    function it_calls_repeat_for_failed_but_recoverable_commands_by_regexp_in_message(CommandInterface $command, CommandCallbacks $callbacks)
+    {
+        $this->handle($command, 422, 'Product model "zzz" does not exist.', $callbacks);
+
+        $callbacks->repeat($command)->shouldBeCalled();
+    }
+
     function it_skips_successful_commands(CommandInterface $command, CommandCallbacks $callbacks)
     {
         $this->handle($command, 201, '', $callbacks);

@@ -12,9 +12,10 @@ class ResponseHandler
     const CREATED = 201;
     const NO_CONTENT = 204;
 
-    const MESSAGES = [
+    const RESPONSE_MESSAGES_OF_RECOVERABLE_COMMANDS = [
         '/^Property "parent" expects a valid parent code\.$/',
         '/^Product model "(.*)" does not exist\.$/',
+        '/^Product "(.*)" does not exist\.$/',
     ];
 
     public function handle(CommandInterface $command, int $responseCode, string $message, CommandCallbacks $callbacks = null, array $errors = [])
@@ -40,15 +41,14 @@ class ResponseHandler
 
     private function isMessageOfRecoverableCommand(string $message): bool
     {
-        foreach (self::MESSAGES as $messageExpression) {
+        foreach (self::RESPONSE_MESSAGES_OF_RECOVERABLE_COMMANDS as $messageExpression) {
             if (1 === preg_match($messageExpression, $message)) {
                 return true;
             }
-
-            return false;
         }
-    }
 
+        return false;
+    }
 
     private function isSuccess(int $responseCode)
     {
