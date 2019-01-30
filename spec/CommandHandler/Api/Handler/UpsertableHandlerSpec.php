@@ -2,8 +2,7 @@
 
 namespace spec\Aa\AkeneoImport\CommandHandler\Api\Handler;
 
-use Aa\AkeneoImport\CommandBus\CommandPromise;
-use Aa\AkeneoImport\CommandHandler\Api\Handler\ResponseHandler;
+use Aa\AkeneoImport\CommandHandler\Api\ResponseHandler;
 use Aa\AkeneoImport\ImportCommand\CommandCallbacks;
 use Akeneo\Pim\ApiClient\Api\Operation\UpsertableResourceListInterface;
 use PhpSpec\ObjectBehavior;
@@ -58,6 +57,6 @@ class UpsertableHandlerSpec extends ObjectBehavior
         $this->handle($command, $callbacks);
         $this->tearDown();
 
-        $responseHandler->handle($command, $callbacks, 200, 'Ok', [])->shouldBeCalled();
+        $responseHandler->handle($command, 200, 'Ok', $callbacks, [])->shouldBeCalled();
     }
 }

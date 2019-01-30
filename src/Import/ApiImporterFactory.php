@@ -3,7 +3,7 @@
 namespace Aa\AkeneoImport\Import;
 
 use Aa\AkeneoImport\CommandBus\CommandBus;
-use Aa\AkeneoImport\CommandHandler\Api\Handler\ResponseHandler;
+use Aa\AkeneoImport\CommandHandler\Api\ResponseHandler;
 use Aa\AkeneoImport\CommandHandler\Api\Handler\UpsertableHandler;
 use Aa\AkeneoImport\CommandHandler\Api\Handler\DeleteHandler;
 use Aa\AkeneoImport\CommandHandler\Api\Handler\MediaHandler;

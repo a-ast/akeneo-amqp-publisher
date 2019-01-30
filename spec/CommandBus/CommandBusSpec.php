@@ -2,7 +2,6 @@
 
 namespace spec\Aa\AkeneoImport\CommandBus;
 
-use Aa\AkeneoImport\CommandBus\CommandPromise;
 use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;

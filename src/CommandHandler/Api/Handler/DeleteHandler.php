@@ -32,6 +32,6 @@ class DeleteHandler implements CommandHandlerInterface
             return $command->getIdentifier();
         }
 
-        throw new CommandHandlerException('Unsupported class of the delete command.');
+        throw new CommandHandlerException('Unsupported class of the delete command.', $command);
     }
 }

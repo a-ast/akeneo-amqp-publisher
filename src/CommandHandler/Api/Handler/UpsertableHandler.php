@@ -2,6 +2,7 @@
 
 namespace Aa\AkeneoImport\CommandHandler\Api\Handler;
 
+use Aa\AkeneoImport\CommandHandler\Api\ResponseHandler;
 use Aa\AkeneoImport\ImportCommand\CommandCallbacks;
 use Aa\AkeneoImport\ImportCommand\CommandHandlerInterface;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
@@ -74,7 +75,6 @@ class UpsertableHandler implements CommandHandlerInterface, InitializableCommand
 
         $this->accumulator->add($commandCode, $commandData);
 
-        // @todo: save command only if callback set (or do I need a command for other exceptions)
         $this->commands[$commandCode] = $command;
         $this->commandCallbacks[$commandCode] = $callbacks;
     }
@@ -94,10 +94,10 @@ class UpsertableHandler implements CommandHandlerInterface, InitializableCommand
             $code = $upsertedResource[$this->commandUniqueProperty];
 
             $command = $this->commands[$code];
-            $callBacks = $this->commandCallbacks[$code] ?? null;
+            $callBacks = $this->commandCallbacks[$code];
 
-            $this->responseHandler->handle($command, $callBacks, $upsertedResource['status_code'],
-                $upsertedResource['message'], $upsertedResource['errors'] ?? []);
+            $this->responseHandler->handle($command, $upsertedResource['status_code'],
+                $upsertedResource['message'], $callBacks, $upsertedResource['errors'] ?? []);
         }
 
         $this->accumulator->clear();

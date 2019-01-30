@@ -1,6 +1,6 @@
 <?php
 
-namespace Aa\AkeneoImport\CommandHandler\Api\Handler;
+namespace Aa\AkeneoImport\CommandHandler\Api;
 
 use Aa\AkeneoImport\ImportCommand\CommandCallbacks;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
@@ -13,13 +13,13 @@ class ResponseHandler
     const NO_CONTENT = 204;
 
 
-    public function handle(CommandInterface $command, CommandCallbacks $callbacks, int $responseCode, string $message, array $errors = [])
+    public function handle(CommandInterface $command, int $responseCode, string $message, CommandCallbacks $callbacks = null, array $errors = [])
     {
         if ($this->isSuccess($responseCode)) {
             return;
         }
 
-        if ($this->isRecoverable($responseCode, $message)) {
+        if ($this->isRecoverable($responseCode, $message) && $callbacks !== null) {
             $callbacks->repeat($command);
 
             return;
