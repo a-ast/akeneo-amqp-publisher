@@ -8,7 +8,7 @@ use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
 use Aa\AkeneoImport\ImportCommand\InitializableCommandHandlerInterface;
 
-class CommandBus
+class CommandBus implements CommandBusInterface
 {
     /**
      * @var CommandHandlerInterface[]

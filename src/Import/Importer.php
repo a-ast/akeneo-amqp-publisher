@@ -2,7 +2,7 @@
 
 namespace Aa\AkeneoImport\Import;
 
-use Aa\AkeneoImport\CommandBus\CommandBus;
+use Aa\AkeneoImport\CommandBus\CommandBusInterface;
 use Aa\AkeneoImport\ImportCommand\CommandCallbacks;
 use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
@@ -12,7 +12,7 @@ use Aa\AkeneoImport\Queue\InMemoryQueue;
 class Importer implements ImporterInterface
 {
     /**
-     * @var CommandBus
+     * @var CommandBusInterface
      */
     private $commandBus;
 
@@ -21,9 +21,15 @@ class Importer implements ImporterInterface
      */
     private $requeuedCommands;
 
-    public function __construct(CommandBus $commandBus)
+    /**
+     * @var int
+     */
+    private $maxRequeueCount;
+
+    public function __construct(CommandBusInterface $commandBus, int $maxRequeueCount = 2)
     {
         $this->commandBus = $commandBus;
+        $this->maxRequeueCount = $maxRequeueCount;
     }
 
     public function import(iterable $commands)
@@ -41,7 +47,7 @@ class Importer implements ImporterInterface
 
             $requeueCount = $this->getRequeueCount($command);
 
-            if ($requeueCount > 2) {
+            if ($requeueCount > $this->maxRequeueCount) {
 
                 // @todo: extend repeat callback with message to know exact reason
                 throw new CommandHandlerException('Command can\'t be processed', $command);

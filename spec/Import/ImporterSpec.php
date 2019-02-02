@@ -3,7 +3,9 @@
 namespace spec\Aa\AkeneoImport\Import;
 
 use Aa\AkeneoImport\CommandBus\CommandBus;
+use Aa\AkeneoImport\CommandBus\CommandBusInterface;
 use Aa\AkeneoImport\ImportCommand\CommandCallbacks;
+use Aa\AkeneoImport\ImportCommand\CommandInterface;
 use Aa\AkeneoImport\ImportCommand\Exception\CommandHandlerException;
 use Aa\AkeneoImport\Queue\CommandQueueInterface;
 use PhpSpec\ObjectBehavior;
@@ -43,18 +45,26 @@ class ImporterSpec extends ObjectBehavior
         $this->import([$command1, $command2]);
     }
 
-    function it_fails_if_command_is_requeued_more_than_x_times(CommandBus $commandBus, CommandQueueInterface $queue, CommandCallbacks $callbacks)
+    function it_fails_if_command_is_requeued_more_than_x_times()
     {
-        $command1 = new TestCommand('1');
+        $this->beConstructedWith(new CommandBusSpy());
 
-        $queue->dequeue()->willReturn($command1, $command1, $command1, $command1);
+        $command = new TestCommand('1');
 
-        $commandBus->setUp()->shouldBeCalled();
-        $commandBus->dispatch(Argument::type(TestCommand::class), Argument::type(CommandCallbacks::class))->shouldBeCalledTimes(2);
-        $commandBus->tearDown()->shouldNotBeCalled();
-
-        $this->shouldThrow(CommandHandlerException::class)->during('import', [[$command1]]);
+        $this->shouldThrow(CommandHandlerException::class)->during('import', [[$command]]);
     }
+}
+
+class CommandBusSpy implements CommandBusInterface
+{
+    public function dispatch(CommandInterface $command, CommandCallbacks $callbacks = null)
+    {
+        $callbacks->repeat($command);
+    }
+
+    public function setUp(): void {}
+
+    public function tearDown(): void {}
 }
 
 
