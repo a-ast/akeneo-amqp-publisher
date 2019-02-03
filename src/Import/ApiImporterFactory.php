@@ -53,12 +53,14 @@ class ApiImporterFactory
             $upsertBatchSize
         );
 
+        // Note: order is important! On the top must be "independent" entities, then "dependent"
+
         $handlers = [
-            CreateProductMediaFile::class => new MediaHandler($client->getProductMediaFileApi(), $responseHandler),
-            CreateProductModelMediaFile::class => new MediaHandler($client->getProductMediaFileApi(), $responseHandler),
             ProductModelFieldInterface::class => $upsertableProductModelHandler,
             ProductFieldInterface::class => $upsertableProductHandler,
             Delete::class => new DeleteHandler($client->getProductApi()),
+            CreateProductMediaFile::class => new MediaHandler($client->getProductMediaFileApi(), $responseHandler),
+            CreateProductModelMediaFile::class => new MediaHandler($client->getProductMediaFileApi(), $responseHandler),
         ];
 
         return new Importer(new CommandBus($handlers));
