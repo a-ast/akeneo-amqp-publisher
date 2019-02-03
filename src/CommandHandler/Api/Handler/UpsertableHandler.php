@@ -97,7 +97,7 @@ class UpsertableHandler implements CommandHandlerInterface, InitializableCommand
             $callBacks = $this->commandCallbacks[$code];
 
             $this->responseHandler->handle($command, $upsertedResource['status_code'],
-                $upsertedResource['message'], $callBacks, $upsertedResource['errors'] ?? []);
+                $upsertedResource['message'] ?? '', $callBacks, $upsertedResource['errors'] ?? []);
         }
 
         $this->accumulator->clear();

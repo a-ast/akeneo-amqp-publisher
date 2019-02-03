@@ -79,7 +79,7 @@ class Importer implements ImporterInterface
                 if ($requeueCount > $this->maxRequeueCount) {
 
                     throw new CommandHandlerException(
-                        sprintf('%s (repeated: %d)', $message, $requeueCount), $command, $code, $errors
+                        sprintf('%s (Repeated: %d times.)', $message, $requeueCount), $command, $code, $errors
                     );
                 }
 
