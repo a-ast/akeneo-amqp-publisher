@@ -45,6 +45,8 @@ class Importer implements ImporterInterface
 
         $callbacks = $this->createCallBacks($queue);
 
+        $tailProcessed = false;
+
         do {
             $command = $queue->dequeue();
 
@@ -56,6 +58,12 @@ class Importer implements ImporterInterface
                 if (null === $command) {
                     break;
                 }
+            }
+
+            if ($this->getRequeueCount($command) > 0 && false === $tailProcessed) {
+                $this->commandBus->tearDown();
+
+                $tailProcessed = true;
             }
 
             $this->commandBus->dispatch($command, $callbacks);
