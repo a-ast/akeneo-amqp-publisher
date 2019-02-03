@@ -26,42 +26,39 @@ composer require aa/akeneo-import
 
 ## Examples
 
-### Create a simple product directly via API
+### Create a simple product via API
  
 ```php
-$command = new UpdateOrCreateProduct('tshirt-red-xl');
+$command = new Product\Create('tshirt-red-xl');
 
-$importer = (new ImporterFactory())->create();
-$handler = (new ApiCommandHandlerFactory())
-                ->createByCredentials('http://akeneo', 'client_id', 'secret', 'user', 'pass');
-
-$importer->import([$command], $handler);
+$importer = (new ApiImporterFactory())->createByCredentials('http://akeneo', 'client_id', 'secret', 'user', 'pass');
+$importer->import([$command]);
 
 ``` 
 
-### Create a simple product and publish it to a message queue
+### Mass import using message broker 
+
+For mass imports you can use message broker like RabbitMQ.
+
+#### Publish commands:
 
 ```php
 
-$command = new UpdateOrCreateProduct('tshirt-red-xl');
+$command = new Product\Create('tshirt-red-xl');
 
-$importer = (new ImporterFactory())->create();
-$handler = (new AmqpCommandHandlerFactory())->createByDsn('dsn://mq');
+$queue = (new QueueFactory())->createByDsn('dsn://mq', 'messages');
 
-$importer->import([$command], $handler);
+$queue->enqueue($command);
 
 ``` 
 
-To read messages from the queue and create products using Akeneo API you need to create a consumer:
+#### Consume commands and redirect them to Akeneo API:
 
 ```php
-$consumer = (new ConsumerFactory())->createByDsn('dsn://mq');
+$queue = (new QueueFactory())->createByDsn('dsn://mq', 'messages');
 
-$handlerFactory = new ApiCommandHandlerFactory();
-$handler = (new ApiCommandHandlerFactory())
-                 ->createByCredentials('http://akeneo', 'client_id', 'secret', 'user', 'pass');
-
-$consumer->consume($handler, $queueName);
+$importer = (new ApiImporterFactory())->createByCredentials('http://akeneo', 'client_id', 'secret', 'user', 'pass');
+$importer->importQueue([$command]);
 
 ```  
 
