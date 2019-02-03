@@ -111,7 +111,7 @@ class ExampleTest extends TestCase
             new ImportCommand\Product\Create('2'),
         ];
 
-        $this->client->getProductApi()->addUpsertResponse('identifier', 1, 422, '', 1);
+        $this->client->getProductApi()->addUpsertResponse('identifier', 1, 422, 'Product "1" does not exist.', 1);
 
         $this->importer->import($commands);
 
