@@ -25,7 +25,7 @@ class ResponseHandler
         }
 
         if ($this->isRecoverable($responseCode, $message) && $callbacks !== null) {
-            $callbacks->repeat($command);
+            $callbacks->repeat($command, $message, $responseCode);
 
             return;
         }

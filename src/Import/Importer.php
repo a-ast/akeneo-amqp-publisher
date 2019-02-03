@@ -43,20 +43,7 @@ class Importer implements ImporterInterface
     {
         $this->commandBus->setUp();
 
-        $callbacks = new CommandCallbacks(function (CommandInterface $command) use ($queue) {
-
-            $requeueCount = $this->getRequeueCount($command);
-
-            if ($requeueCount > $this->maxRequeueCount) {
-
-                // @todo: extend repeat callback with message to know exact reason
-                throw new CommandHandlerException('Command can\'t be processed', $command);
-            }
-            $this->requeuedCommands[spl_object_hash($command)] = $requeueCount + 1;
-
-            $queue->enqueue($command);
-
-        });
+        $callbacks = $this->createCallBacks($queue);
 
         do {
             $command = $queue->dequeue();
@@ -79,5 +66,27 @@ class Importer implements ImporterInterface
     private function getRequeueCount(CommandInterface $command): int
     {
         return $this->requeuedCommands[spl_object_hash($command)] ?? 0;
+    }
+
+    private function createCallBacks(CommandQueueInterface $queue): CommandCallbacks
+    {
+        return new CommandCallbacks(
+
+            function (CommandInterface $command, string $message = '', int $code = 0, array $errors = []) use ($queue) {
+
+                $requeueCount = $this->getRequeueCount($command);
+
+                if ($requeueCount > $this->maxRequeueCount) {
+
+                    throw new CommandHandlerException(
+                        sprintf('%s (repeated: %d)', $message, $requeueCount), $command, $code, $errors
+                    );
+                }
+
+                $this->requeuedCommands[spl_object_hash($command)] = $requeueCount + 1;
+
+                $queue->enqueue($command);
+            }
+        );
     }
 }
