@@ -3,7 +3,6 @@
 namespace Aa\AkeneoImport\Queue;
 
 use Enqueue\AmqpExt\AmqpConnectionFactory;
-use Interop\Queue\Context;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
@@ -14,28 +13,14 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 
-class RemoteQueueFactory
+class QueueFactory
 {
-    /**
-     * @var string
-     */
-    private $dsn;
-
-    /**
-     * @var Context
-     */
-    private $context;
-
-    public function __construct(string $dsn)
+    public function createByDsn(string $dsn, string $queueName): CommandQueueInterface
     {
-        $this->dsn = $dsn;
-    }
+        $factory = new AmqpConnectionFactory($dsn);
+        $context = $factory->createContext();
 
-    public function create(string $queueName): CommandQueueInterface
-    {
-        $this->initializeContext();
-
-        $queue = new RemoteQueue($queueName, $this->context, $this->createSerializer());
+        $queue = new RemoteQueue($queueName, $context, $this->createSerializer());
 
         return $queue;
     }
