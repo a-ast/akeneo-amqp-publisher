@@ -43,14 +43,4 @@ class QueueFactory
 
         return $serializer;
     }
-
-    private function initializeContext(): void
-    {
-        if (null !== $this->context) {
-            return;
-        }
-
-        $factory = new AmqpConnectionFactory($this->dsn);
-        $this->context = $factory->createContext();
-    }
 }
