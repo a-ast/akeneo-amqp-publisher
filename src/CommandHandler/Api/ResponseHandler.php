@@ -13,7 +13,7 @@ class ResponseHandler
     const NO_CONTENT = 204;
 
     const RESPONSE_MESSAGES_OF_RECOVERABLE_COMMANDS = [
-        '/^Property "parent" expects a valid parent code\.$/',
+        '/^Property "parent" expects a valid parent code\./',
         '/^Product model "(.*)" does not exist\.$/',
         '/^Product "(.*)" does not exist\.$/',
     ];
