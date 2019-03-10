@@ -16,7 +16,7 @@ using message brokers like RabbitMQ.
 * Mass media file import. 
 * Import from older Akeneo versions.
 * Data generation for testing, local development or performance benchmarking.
-* Batch data manipulations (e.g. if you can't implement mass actions in Akeneo e.g. in Serenity edition).
+* Batch data transformation (e.g. if you can't implement mass actions in Akeneo e.g. in Serenity edition).
 
 
 ## Installation
