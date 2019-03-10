@@ -39,7 +39,7 @@ class UpsertableHandler implements CommandHandlerInterface, InitializableCommand
     private $normalizer;
 
     /**
-     * @var array|CommandInterface[]
+     * @var array|CommandInterface[][]
      */
     private $commands;
 

@@ -58,7 +58,7 @@ class RemoteQueue implements CommandQueueInterface
             'type' => get_class($command),
         ];
 
-        $message = $this->context->createMessage($body, [], $headers);
+        $message = $this->createMessage($body, $headers);
 
         $this->producer->send($this->queue, $message);
     }
@@ -125,5 +125,12 @@ class RemoteQueue implements CommandQueueInterface
         }
 
         $this->consumer = $this->context->createConsumer($this->queue);
+    }
+    
+    private function createMessage(string $body, array $headers): \Interop\Queue\Message
+    {
+        $message = $this->context->createMessage($body, [], $headers);
+
+        return $message;
     }
 }

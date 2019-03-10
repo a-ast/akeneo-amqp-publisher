@@ -12,21 +12,21 @@ class ResponseHandlerSpec extends ObjectBehavior
 {
     function it_calls_repeat_for_failed_but_recoverable_commands(CommandInterface $command, CommandCallbacks $callbacks)
     {
-        $this->handle($command, 422, 'Property "parent" expects a valid parent code.', $callbacks);
+        $this->handleCommand($command, 422, 'Property "parent" expects a valid parent code.', $callbacks);
 
         $callbacks->repeat($command, 'Property "parent" expects a valid parent code.', 422)->shouldBeCalled();
     }
 
     function it_calls_repeat_for_failed_but_recoverable_commands_by_regexp_in_message(CommandInterface $command, CommandCallbacks $callbacks)
     {
-        $this->handle($command, 422, 'Product model "zzz" does not exist.', $callbacks);
+        $this->handleCommand($command, 422, 'Product model "zzz" does not exist.', $callbacks);
 
         $callbacks->repeat($command, 'Product model "zzz" does not exist.', 422)->shouldBeCalled();
     }
 
     function it_skips_successful_commands(CommandInterface $command, CommandCallbacks $callbacks)
     {
-        $this->handle($command, 201, '', $callbacks);
+        $this->handleCommand($command, 201, '', $callbacks);
 
         $callbacks->repeat(Argument::any())->shouldNotBeCalled();
         $callbacks->reject(Argument::any())->shouldNotBeCalled();

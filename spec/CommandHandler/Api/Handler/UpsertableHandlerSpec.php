@@ -57,6 +57,6 @@ class UpsertableHandlerSpec extends ObjectBehavior
         $this->handle($command, $callbacks);
         $this->tearDown();
 
-        $responseHandler->handle($command, 200, 'Ok', $callbacks, [])->shouldBeCalled();
+        $responseHandler->handleCommands([$command], 200, 'Ok', $callbacks, [])->shouldBeCalled();
     }
 }

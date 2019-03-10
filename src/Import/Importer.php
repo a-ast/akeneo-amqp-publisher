@@ -61,7 +61,7 @@ class Importer implements ImporterInterface
             $command = $queue->dequeue();
 
             if (null === $command) {
-                $this->logger->info('***** End of queue. Tear down!');
+                $this->log('***** End of queue. Tear down!');
 
                 $this->commandBus->tearDown();
                 $command = $queue->dequeue();
@@ -73,7 +73,7 @@ class Importer implements ImporterInterface
 
             // tear down when processing republished commands
             if ($this->getRequeueCount($command) > 0 && false === $tailProcessed) {
-                $this->logger->info('----- Tail. Tear down!');
+                $this->log('----- Tail. Tear down!');
 
                 $this->commandBus->tearDown();
 
@@ -137,6 +137,15 @@ class Importer implements ImporterInterface
 
     private function dumpCommand(CommandInterface $command)
     {
-        $this->logger->info($this->getCommandUniqueId($command));
+        $this->log($this->getCommandUniqueId($command));
+    }
+
+    private function log(string $message)
+    {
+        if (null === $this->logger) {
+            return;
+        }
+
+        $this->logger->info($message);
     }
 }
