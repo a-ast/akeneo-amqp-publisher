@@ -43,7 +43,7 @@ class MediaHandler implements CommandHandlerInterface
 
         } catch (UnprocessableEntityHttpException $e) {
 
-            $this->responseHandler->handle($command, $e->getCode(), $e->getMessage(), $callbacks);
+            $this->responseHandler->handleCommand($command, $e->getCode(), $e->getMessage(), $callbacks);
 
         }
     }

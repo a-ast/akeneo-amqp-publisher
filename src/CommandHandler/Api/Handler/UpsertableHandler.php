@@ -75,7 +75,7 @@ class UpsertableHandler implements CommandHandlerInterface, InitializableCommand
 
         $this->accumulator->add($commandCode, $commandData);
 
-        $this->commands[$commandCode] = $command;
+        $this->commands[$commandCode][] = $command;
         $this->commandCallbacks[$commandCode] = $callbacks;
     }
 
@@ -93,11 +93,14 @@ class UpsertableHandler implements CommandHandlerInterface, InitializableCommand
 
             $code = $upsertedResource[$this->commandUniqueProperty];
 
-            $command = $this->commands[$code];
             $callBacks = $this->commandCallbacks[$code];
+            $message = $upsertedResource['message'] ?? '';
+            $errors = $upsertedResource['errors'] ?? [];
+            $statusCode = $upsertedResource['status_code'];
+            $commands = $this->commands[$code];
 
-            $this->responseHandler->handle($command, $upsertedResource['status_code'],
-                $upsertedResource['message'] ?? '', $callBacks, $upsertedResource['errors'] ?? []);
+            $this->responseHandler->handleCommands($commands,
+                $statusCode, $message, $callBacks, $errors);
         }
 
         $this->accumulator->clear();

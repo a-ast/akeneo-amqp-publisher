@@ -12,19 +12,13 @@ class ResponseHandler
     const CREATED = 201;
     const NO_CONTENT = 204;
 
-    const RESPONSE_MESSAGES_OF_RECOVERABLE_COMMANDS = [
-        '/^Property "parent" expects a valid parent code\./',
-        '/^Product model "(.*)" does not exist\.$/',
-        '/^Product "(.*)" does not exist\.$/',
-    ];
-
-    public function handle(CommandInterface $command, int $responseCode, string $message, CommandCallbacks $callbacks = null, array $errors = [])
+    public function handleCommand(CommandInterface $command, int $responseCode, string $message, CommandCallbacks $callbacks = null, array $errors = [])
     {
         if ($this->isSuccess($responseCode)) {
             return;
         }
 
-        if ($this->isRecoverable($responseCode, $message) && $callbacks !== null) {
+        if ($this->isRecoverable($responseCode) && $callbacks !== null) {
             $callbacks->repeat($command, $message, $responseCode);
 
             return;
@@ -33,21 +27,28 @@ class ResponseHandler
         throw new CommandHandlerException($message, $command, $responseCode, $errors);
     }
 
-    private function isRecoverable(int $responseCode, string $message): bool
+    public function handleCommands(array $commands, int $responseCode, string $message, CommandCallbacks $callbacks = null, array $errors = [])
     {
-        return (self::UNPROCESSABLE_ENTITY === $responseCode &&
-            $this->isMessageOfRecoverableCommand($message));
-    }
-
-    private function isMessageOfRecoverableCommand(string $message): bool
-    {
-        foreach (self::RESPONSE_MESSAGES_OF_RECOVERABLE_COMMANDS as $messageExpression) {
-            if (1 === preg_match($messageExpression, $message)) {
-                return true;
-            }
+        if ($this->isSuccess($responseCode)) {
+            return;
         }
 
-        return false;
+        if ($this->isRecoverable($responseCode) && $callbacks !== null) {
+
+            foreach ($commands as $command) {
+                $callbacks->repeat($command, $message, $responseCode);
+            }
+
+            return;
+        }
+
+        // @todo: is it reasonable to select first command. add checks.
+        throw new CommandHandlerException($message, $commands[0], $responseCode, $errors);
+    }
+
+    private function isRecoverable(int $responseCode): bool
+    {
+        return (self::UNPROCESSABLE_ENTITY === $responseCode);
     }
 
     private function isSuccess(int $responseCode)
