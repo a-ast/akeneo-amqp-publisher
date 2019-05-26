@@ -1,4 +1,4 @@
-# Akeneo Import
+# Akeneo Import (DEPRECATED)
 
 **DEPRECATED** Please consider using [Akeneo Data Loader](https://github.com/a-ast/akeneo-data-loader)
 
