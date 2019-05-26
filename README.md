@@ -1,6 +1,6 @@
 # Akeneo Import
 
-[![Build Status](https://travis-ci.org/a-ast/akeneo-import.svg?branch=master)](https://travis-ci.org/a-ast/akeneo-import)
+**DEPRECATED** Please consider using [Akeneo Data Loader](https://github.com/a-ast/akeneo-data-loader)
 
 Akeneo Import simplifies data import to Akeneo PIM.
 
